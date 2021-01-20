@@ -1,9 +1,16 @@
-package greeting
+package greetings
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
-// Return a welcome message for the named person.
-func Hello(name string) string {
+// Hello returns a welcome message for the named person.
+func Hello(name string) (string, error) {
+	if name == "" {
+		return "", errors.New("Empty name")
+	}
+
 	message := fmt.Sprintf("Hi, %v. Welcome!", name)
-	return message
+	return message, nil
 }
