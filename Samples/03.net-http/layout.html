@@ -1,0 +1,16 @@
+{{template "header" .}}
+<body>
+    <div class="content">
+        <h1>{{.PageTitle}}</h1>
+        <hr />
+        <ul class="list-group">
+            {{range .Todos}}
+                {{if.IsDone}}
+                    <li class="list-group-item disabled">{{.Title}}</li>
+                {{else}}
+                    <li class="list-group-item">{{.Title}}</li>
+                {{end}}
+            {{end}}
+        </ul>
+    </div>
+</body>

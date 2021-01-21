@@ -5,14 +5,19 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"text/template"
+	"types"
 )
 
 var counter int
 
 func main() {
 	http.HandleFunc("/", handler)
-	http.HandleFunc("/count", handlerCounter)  // E.q. /count
-	http.HandleFunc("/count/", handlerCounter) // E.q. /count/xxxx
+	http.HandleFunc("/count", handlerCounter)  // "/count"
+	http.HandleFunc("/count/", handlerCounter) // "/count/xxxx"
+
+	http.HandleFunc("/todo", handlerTodo) // "/todo"
+
 	log.Fatal(http.ListenAndServe("localhost:8000", nil))
 }
 
@@ -32,4 +37,17 @@ func handlerCounter(rw http.ResponseWriter, req *http.Request) {
 			<body><h2>Counter = ` + strconv.Itoa(counter) + `</h2></body>
 			</html>`
 	rw.Write([]byte(html))
+}
+
+func handlerTodo(rw http.ResponseWriter, req *http.Request) {
+	tmpl := template.Must(template.Must(template.ParseFiles("./layout.html")).ParseFiles("./header.html"))
+	data := types.TodoPageData{
+		PageTitle: "My TODO list",
+		Todos: []types.Todo{
+			{Title: "Task A", IsDone: false},
+			{Title: "Task B", IsDone: true},
+			{Title: "Task C", IsDone: true},
+		},
+	}
+	tmpl.Execute(rw, data)
 }
