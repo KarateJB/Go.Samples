@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 var counter int
@@ -18,10 +19,17 @@ func main() {
 func handler(rw http.ResponseWriter, req *http.Request) {
 	rw.WriteHeader(http.StatusOK)
 	// rw.Write([]byte(`My website`))
-	fmt.Fprintf(rw, "URL.Path = %q\n", req.URL.Path)
+	fmt.Fprintf(rw, "Welcome, your current URL.Path = %q\n", req.URL.Path)
 }
 
 func handlerCounter(rw http.ResponseWriter, req *http.Request) {
 	counter++
-	fmt.Fprintf(rw, "Counter = %d\n", counter)
+	rw.WriteHeader(http.StatusOK)
+	// fmt.Fprintf(rw, "Counter = %d\n", counter)
+	html := `<!DOCTYPE html>
+			<html>
+			<head><title>My counter</title></head>
+			<body><h2>Counter = ` + strconv.Itoa(counter) + `</h2></body>
+			</html>`
+	rw.Write([]byte(html))
 }
