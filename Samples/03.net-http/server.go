@@ -62,7 +62,10 @@ func handlerTodoCreate(rw http.ResponseWriter, req *http.Request) {
 		}
 		fmt.Fprintf(rw, "PostFrom = %v\n", req.PostForm)
 		todo := req.FormValue("todo")
-		fmt.Fprintf(rw, "Todo = %s\n", todo)
+		isDone := req.FormValue("isDone") != ""
+		fmt.Fprintf(rw, "Todo = %s, IsDone = %v\n", todo, isDone)
+		myTodoList.Todos = append(myTodoList.Todos, types.Todo{Title: todo, IsDone: isDone})
+		fmt.Fprintf(rw, "TODOs = %v\n", myTodoList)
 	default:
 		rw.WriteHeader(http.StatusNotFound)
 	}
