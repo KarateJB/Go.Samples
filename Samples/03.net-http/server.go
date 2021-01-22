@@ -60,12 +60,12 @@ func handlerTodoCreate(rw http.ResponseWriter, req *http.Request) {
 			fmt.Fprintf(rw, "ParseForm() err: %v", err)
 			return
 		}
-		fmt.Fprintf(rw, "PostFrom = %v\n", req.PostForm)
+		// fmt.Fprintf(rw, "PostFrom = %v\n", req.PostForm)
 		todo := req.FormValue("todo")
 		isDone := req.FormValue("isDone") != ""
-		fmt.Fprintf(rw, "Todo = %s, IsDone = %v\n", todo, isDone)
+		// fmt.Fprintf(rw, "Todo = %s, IsDone = %v\n", todo, isDone)
 		myTodoList.Todos = append(myTodoList.Todos, types.Todo{Title: todo, IsDone: isDone})
-		fmt.Fprintf(rw, "TODOs = %v\n", myTodoList)
+		http.Redirect(rw, req, "/todo", http.StatusPermanentRedirect)
 	default:
 		rw.WriteHeader(http.StatusNotFound)
 	}
