@@ -1,0 +1,14 @@
+{{template "header" .}}
+<body>
+  <form class="form-inline" method="POST" action="/todo/create">
+    <label class="sr-only" for="inlineFormInputName2">TODO</label>
+    <input
+      type="text"
+      name="todo"
+      class="form-control mb-4 mr-sm-4"
+      id="inlineFormInputName2"
+      placeholder="Enter something here..."
+    />
+    <button type="submit" class="btn btn-primary mb-2">Add</button>
+  </form>
+</body>

@@ -10,13 +10,24 @@ import (
 )
 
 var counter int
+var myTodoList types.TodoPageData
 
 func main() {
+	myTodoList = types.TodoPageData{
+		PageTitle: "My TODO list",
+		Todos: []types.Todo{
+			{Title: "Task A", IsDone: false},
+			{Title: "Task B", IsDone: true},
+			{Title: "Task C", IsDone: true},
+		},
+	}
+
 	http.HandleFunc("/", handler)
 	http.HandleFunc("/count", handlerCounter)  // "/count"
 	http.HandleFunc("/count/", handlerCounter) // "/count/xxxx"
 
-	http.HandleFunc("/todo", handlerTodo) // "/todo"
+	http.HandleFunc("/todo", handlerTodoList)          // "/todo"
+	http.HandleFunc("/todo/create", handlerTodoCreate) // "/todo/create"
 
 	log.Fatal(http.ListenAndServe("localhost:8000", nil))
 }
@@ -39,15 +50,25 @@ func handlerCounter(rw http.ResponseWriter, req *http.Request) {
 	rw.Write([]byte(html))
 }
 
-func handlerTodo(rw http.ResponseWriter, req *http.Request) {
-	tmpl := template.Must(template.Must(template.ParseFiles("./layout.html")).ParseFiles("./header.html"))
-	data := types.TodoPageData{
-		PageTitle: "My TODO list",
-		Todos: []types.Todo{
-			{Title: "Task A", IsDone: false},
-			{Title: "Task B", IsDone: true},
-			{Title: "Task C", IsDone: true},
-		},
+func handlerTodoCreate(rw http.ResponseWriter, req *http.Request) {
+	switch req.Method {
+	case "GET":
+		tmpl := template.Must(template.Must(template.ParseFiles("./todo-create.html")).ParseFiles("./header.html"))
+		tmpl.Execute(rw, nil)
+	case "POST":
+		if err := req.ParseForm(); err != nil {
+			fmt.Fprintf(rw, "ParseForm() err: %v", err)
+			return
+		}
+		fmt.Fprintf(rw, "PostFrom = %v\n", req.PostForm)
+		todo := req.FormValue("todo")
+		fmt.Fprintf(rw, "Todo = %s\n", todo)
+	default:
+		rw.WriteHeader(http.StatusNotFound)
 	}
-	tmpl.Execute(rw, data)
+}
+
+func handlerTodoList(rw http.ResponseWriter, req *http.Request) {
+	tmpl := template.Must(template.Must(template.ParseFiles("./todo-list.html")).ParseFiles("./header.html"))
+	tmpl.Execute(rw, myTodoList)
 }
