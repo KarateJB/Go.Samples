@@ -72,6 +72,12 @@ func handlerTodoCreate(rw http.ResponseWriter, req *http.Request) {
 }
 
 func handlerTodoList(rw http.ResponseWriter, req *http.Request) {
-	tmpl := template.Must(template.Must(template.ParseFiles("./todo-list.html")).ParseFiles("./header.html"))
+	tmpl := template.Must(template.New("todo-list.html").Funcs(template.FuncMap{"inc": inc}).ParseFiles("./header.html", "./todo-list.html"))
+	// tmpl := template.Must(template.Must(template.ParseFiles("./todo-list.html")).ParseFiles("./header.html"))
 	tmpl.Execute(rw, myTodoList)
+}
+
+// inc: increment by 1
+func inc(i int) int {
+	return i + 1
 }
