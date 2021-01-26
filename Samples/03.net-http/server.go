@@ -65,7 +65,7 @@ func handlerTodoCreate(rw http.ResponseWriter, req *http.Request) {
 		isDone := req.FormValue("isDone") != ""
 		// fmt.Fprintf(rw, "Todo = %s, IsDone = %v\n", todo, isDone)
 		myTodoList.Todos = append(myTodoList.Todos, types.Todo{Title: todo, IsDone: isDone})
-		http.Redirect(rw, req, "/todo", http.StatusPermanentRedirect)
+		http.Redirect(rw, req, "/todo", http.StatusSeeOther)
 	default:
 		rw.WriteHeader(http.StatusNotFound)
 	}
@@ -74,14 +74,9 @@ func handlerTodoCreate(rw http.ResponseWriter, req *http.Request) {
 func handlerTodoList(rw http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "GET":
-		if len(myTodoList.Todos) == 3 {
-			tmpl := template.Must(template.New("todo-list.html").Funcs(template.FuncMap{"inc": inc}).ParseFiles("./header.html", "./todo-list.html"))
-			// tmpl := template.Must(template.Must(template.ParseFiles("./todo-list.html")).ParseFiles("./header.html"))
-			tmpl.Execute(rw, myTodoList)
-		} else {
-			fmt.Fprintf(rw, "RemoveId = %v", myTodoList.Todos)
-		}
-
+		tmpl := template.Must(template.New("todo-list.html").Funcs(template.FuncMap{"inc": inc}).ParseFiles("./header.html", "./todo-list.html"))
+		// tmpl := template.Must(template.Must(template.ParseFiles("./todo-list.html")).ParseFiles("./header.html"))
+		tmpl.Execute(rw, myTodoList)
 	case "POST":
 		if err := req.ParseForm(); err != nil {
 			fmt.Fprintf(rw, "ParseForm() err: %v", err)
@@ -89,10 +84,9 @@ func handlerTodoList(rw http.ResponseWriter, req *http.Request) {
 		}
 		removeIndex, _ := strconv.Atoi(req.FormValue("removeId"))
 		// todosNew := myTodoList.Todos
-		nextIndex := removeIndex + 1
-		myTodoList.Todos = append(myTodoList.Todos[:removeIndex], myTodoList.Todos[nextIndex:]...)
-		fmt.Fprintf(rw, "RemoveId = %v", myTodoList.Todos)
-		// http.Redirect(rw, req, "/todo", http.StatusPermanentRedirect)
+		myTodoList.Todos = append(myTodoList.Todos[:removeIndex], myTodoList.Todos[removeIndex+1:]...)
+		// fmt.Fprintf(rw, "RemoveId = %v", myTodoList.Todos)
+		http.Redirect(rw, req, "/todo", http.StatusSeeOther)
 	default:
 		rw.WriteHeader(http.StatusNotFound)
 	}
