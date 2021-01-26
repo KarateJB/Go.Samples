@@ -82,10 +82,19 @@ func handlerTodoList(rw http.ResponseWriter, req *http.Request) {
 			fmt.Fprintf(rw, "ParseForm() err: %v", err)
 			return
 		}
+
+		// (Optional) To get URL parameter
+		// removeIndexs, isOk := req.URL.Query()["removeId"]
+		// if !isOk || len(removeIndexs) < 1 {
+		// 	rw.WriteHeader(http.StatusBadRequest)
+		// }
+		// removeIndex, _ := strconv.Atoi(removeIndexs[0])
+
+		// 2. Using Form post
 		removeIndex, _ := strconv.Atoi(req.FormValue("removeId"))
-		// todosNew := myTodoList.Todos
-		myTodoList.Todos = append(myTodoList.Todos[:removeIndex], myTodoList.Todos[removeIndex+1:]...)
-		// fmt.Fprintf(rw, "RemoveId = %v", myTodoList.Todos)
+
+		todosNew := &(myTodoList.Todos)
+		*todosNew = append((*todosNew)[:removeIndex], (*todosNew)[removeIndex+1:]...)
 		http.Redirect(rw, req, "/todo", http.StatusSeeOther)
 	default:
 		rw.WriteHeader(http.StatusNotFound)
