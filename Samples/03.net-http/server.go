@@ -29,7 +29,7 @@ func main() {
 	http.HandleFunc("/todo", handlerTodoList)          // "/todo"
 	http.HandleFunc("/todo/create", handlerTodoCreate) // "/todo/create"
 
-	log.Fatal(http.ListenAndServe("localhost:8000", nil))
+	log.Fatal(http.ListenAndServe("localhost:8001", nil))
 }
 
 func handler(rw http.ResponseWriter, req *http.Request) {
@@ -72,9 +72,30 @@ func handlerTodoCreate(rw http.ResponseWriter, req *http.Request) {
 }
 
 func handlerTodoList(rw http.ResponseWriter, req *http.Request) {
-	tmpl := template.Must(template.New("todo-list.html").Funcs(template.FuncMap{"inc": inc}).ParseFiles("./header.html", "./todo-list.html"))
-	// tmpl := template.Must(template.Must(template.ParseFiles("./todo-list.html")).ParseFiles("./header.html"))
-	tmpl.Execute(rw, myTodoList)
+	switch req.Method {
+	case "GET":
+		if len(myTodoList.Todos) == 3 {
+			tmpl := template.Must(template.New("todo-list.html").Funcs(template.FuncMap{"inc": inc}).ParseFiles("./header.html", "./todo-list.html"))
+			// tmpl := template.Must(template.Must(template.ParseFiles("./todo-list.html")).ParseFiles("./header.html"))
+			tmpl.Execute(rw, myTodoList)
+		} else {
+			fmt.Fprintf(rw, "RemoveId = %v", myTodoList.Todos)
+		}
+
+	case "POST":
+		if err := req.ParseForm(); err != nil {
+			fmt.Fprintf(rw, "ParseForm() err: %v", err)
+			return
+		}
+		removeIndex, _ := strconv.Atoi(req.FormValue("removeId"))
+		// todosNew := myTodoList.Todos
+		nextIndex := removeIndex + 1
+		myTodoList.Todos = append(myTodoList.Todos[:removeIndex], myTodoList.Todos[nextIndex:]...)
+		fmt.Fprintf(rw, "RemoveId = %v", myTodoList.Todos)
+		// http.Redirect(rw, req, "/todo", http.StatusPermanentRedirect)
+	default:
+		rw.WriteHeader(http.StatusNotFound)
+	}
 }
 
 // inc: increment by 1
