@@ -34,7 +34,11 @@ func main() {
 
 func handler(rw http.ResponseWriter, req *http.Request) {
 	rw.WriteHeader(http.StatusOK)
+
+	// Use http.ResponseWriter
 	// rw.Write([]byte(`My website`))
+
+	// Or use fmt.Fprintf
 	fmt.Fprintf(rw, "Welcome, your current URL.Path = %q\n", req.URL.Path)
 }
 
