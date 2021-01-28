@@ -57,7 +57,7 @@ func handlerCounter(rw http.ResponseWriter, req *http.Request) {
 func handlerTodoCreate(rw http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "GET":
-		tmpl := template.Must(template.Must(template.ParseFiles("./todo-create.html")).ParseFiles("./header.html"))
+		tmpl := template.Must(template.New("todo-create.html").ParseFiles("./todo-create.html", "./header.html"))
 		tmpl.Execute(rw, nil)
 	case "POST":
 		if err := req.ParseForm(); err != nil {
@@ -95,7 +95,7 @@ func handlerTodoList(rw http.ResponseWriter, req *http.Request) {
 		// removeIndex, _ := strconv.Atoi(removeIndexs[0])
 
 		// 2. Using Form post
-		removeIndex, _ := strconv.Atoi(req.FormValue("removeId"))
+		removeIndex, _ := strconv.Atoi(req.FormValue("removeId")) // Convert string to int
 
 		todosNew := &(myTodoList.Todos)
 		*todosNew = append((*todosNew)[:removeIndex], (*todosNew)[removeIndex+1:]...)

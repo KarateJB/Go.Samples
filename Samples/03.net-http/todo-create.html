@@ -1,16 +1,15 @@
 {{template "header" .}}
 <body>
-  <form class="form-inline" method="POST" action="/todo/create">
+  <form class="form-inline" method="POST" action="/todo/create" autocomplete="off">
     <label class="sr-only" for="inlineFormInputName2">TODO</label>
     <input
       type="text"
       name="todo"
       class="form-control mb-4 mr-sm-4"
-      id="inlineFormInputName2"
       placeholder="Enter something here..."
     />
     <div class="form-check mb-2 mr-sm-2">
-        <input class="form-check-input" type="checkbox" id="isDone" name="isDone">
+        <input class="form-check-input" type="checkbox" name="isDone">
         <label class="form-check-label" for="inlineFormCheck">
             Is done?
         </label>
