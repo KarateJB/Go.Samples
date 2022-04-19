@@ -65,8 +65,8 @@ func handlerTodoCreate(rw http.ResponseWriter, req *http.Request) {
 			return
 		}
 		// fmt.Fprintf(rw, "PostFrom = %v\n", req.PostForm)
-		todo := req.FormValue("todo")
-		isDone := req.FormValue("isDone") != ""
+		todo := req.FormValue("todo")           // "todo" is the name of the input dom
+		isDone := req.FormValue("isDone") != "" // "isDone" is the name of the checkbox dom
 		// fmt.Fprintf(rw, "Todo = %s, IsDone = %v\n", todo, isDone)
 		myTodoList.Todos = append(myTodoList.Todos, types.Todo{Title: todo, IsDone: isDone})
 		http.Redirect(rw, req, "/todo", http.StatusSeeOther)
