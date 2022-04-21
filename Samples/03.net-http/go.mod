@@ -4,4 +4,7 @@ go 1.15
 
 replace types => ./types
 
-require types v1.1.0
+require (
+	golang.org/x/tools v0.1.10 // indirect
+	types v1.1.0
+)

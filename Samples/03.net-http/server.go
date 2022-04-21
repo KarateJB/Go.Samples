@@ -1,9 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"text/template"
 	"types"
@@ -13,13 +16,25 @@ var counter int
 var myTodoList types.TodoPageData
 
 func main() {
+	// Read json file as bytes
+	bytes := readJsonFile("./files/todo-list.json")
+
+	// Deserialize to struct
+	var todos []types.Todo
+	json.Unmarshal([]byte(bytes), &todos)
+
+	// Debug
+	todosJson, _ := json.MarshalIndent(todos, "", "\t")
+	log.Println(string(todosJson))
+
 	myTodoList = types.TodoPageData{
 		PageTitle: "My TODO list",
-		Todos: []types.Todo{
-			{Title: "Task A", IsDone: false},
-			{Title: "Task B", IsDone: true},
-			{Title: "Task C", IsDone: true},
-		},
+		Todos:     todos,
+		// Todos: []types.Todo{
+		// 	{Title: "Task A", IsDone: false},
+		// 	{Title: "Task B", IsDone: true},
+		// 	{Title: "Task C", IsDone: true},
+		// },
 	}
 
 	http.HandleFunc("/", handler)
@@ -28,6 +43,7 @@ func main() {
 
 	http.HandleFunc("/todo", handlerTodoList)          // "/todo"
 	http.HandleFunc("/todo/create", handlerTodoCreate) // "/todo/create"
+	http.HandleFunc("/todo/save", handlerTodoSave)     // "todo/save"
 
 	log.Fatal(http.ListenAndServe("localhost:8001", nil))
 }
@@ -98,7 +114,7 @@ func handlerTodoList(rw http.ResponseWriter, req *http.Request) {
 		removeIndex, _ := strconv.Atoi(req.FormValue("removeId")) // Convert string to int
 
 		todosNew := &(myTodoList.Todos)
-		*todosNew = append((*todosNew)[:removeIndex], (*todosNew)[removeIndex+1:]...)
+		*todosNew = append((*todosNew)[:removeIndex], (*todosNew)[removeIndex+1:]...) // Append elements before and after the removed index.
 		http.Redirect(rw, req, "/todo", http.StatusSeeOther)
 	default:
 		rw.WriteHeader(http.StatusNotFound)
@@ -108,4 +124,20 @@ func handlerTodoList(rw http.ResponseWriter, req *http.Request) {
 // inc: increment by 1
 func inc(i int) int {
 	return i + 1
+}
+
+// readJsonFile: read json file as bytes
+func readJsonFile(path string) []byte {
+	jsonFile, err := os.Open(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer jsonFile.Close()
+
+	bytes, err := ioutil.ReadAll(jsonFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return bytes
 }
