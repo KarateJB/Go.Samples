@@ -15,17 +15,19 @@ import (
 var counter int
 var myTodoList types.TodoPageData
 
+const JSON_FILE_PATH = "./files/todo-list.json"
+
 func main() {
 	// Read json file as bytes
-	bytes := readJsonFile("./files/todo-list.json")
+	bytes := readJsonFile(JSON_FILE_PATH)
 
 	// Deserialize to struct
 	var todos []types.Todo
 	json.Unmarshal([]byte(bytes), &todos)
 
 	// Debug
-	todosJson, _ := json.MarshalIndent(todos, "", "\t")
-	log.Println(string(todosJson))
+	// todosJson, _ := json.MarshalIndent(todos, "", "\t")
+	// log.Println(string(todosJson))
 
 	myTodoList = types.TodoPageData{
 		PageTitle: "My TODO list",
@@ -43,7 +45,7 @@ func main() {
 
 	http.HandleFunc("/todo", handlerTodoList)          // "/todo"
 	http.HandleFunc("/todo/create", handlerTodoCreate) // "/todo/create"
-	http.HandleFunc("/todo/save", handlerTodoSave)     // "todo/save"
+	// http.HandleFunc("/todo/save", handlerTodoSave)     // "todo/save"
 
 	log.Fatal(http.ListenAndServe("localhost:8001", nil))
 }
@@ -115,6 +117,14 @@ func handlerTodoList(rw http.ResponseWriter, req *http.Request) {
 
 		todosNew := &(myTodoList.Todos)
 		*todosNew = append((*todosNew)[:removeIndex], (*todosNew)[removeIndex+1:]...) // Append elements before and after the removed index.
+
+		// Write to json file
+		todosJson, _ := json.MarshalIndent(todosNew, "", "\t")
+		log.Printf("Shit")
+		log.Println(string(todosJson))
+		writeJsonFile(JSON_FILE_PATH, string(todosJson))
+
+		// Redirect
 		http.Redirect(rw, req, "/todo", http.StatusSeeOther)
 	default:
 		rw.WriteHeader(http.StatusNotFound)
@@ -140,4 +150,19 @@ func readJsonFile(path string) []byte {
 	}
 
 	return bytes
+}
+
+// writeJsonFile: write json file
+func writeJsonFile(path string, str string) {
+	jsonFile, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755) // Set the overwrite permission
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer jsonFile.Close()
+
+	_, err = jsonFile.WriteString(str)
+	if err != nil {
+		log.Fatal(err)
+	}
+	jsonFile.Sync()
 }
