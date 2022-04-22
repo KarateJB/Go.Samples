@@ -86,7 +86,15 @@ func handlerTodoCreate(rw http.ResponseWriter, req *http.Request) {
 		todo := req.FormValue("todo")           // "todo" is the name of the input dom
 		isDone := req.FormValue("isDone") != "" // "isDone" is the name of the checkbox dom
 		// fmt.Fprintf(rw, "Todo = %s, IsDone = %v\n", todo, isDone)
-		myTodoList.Todos = append(myTodoList.Todos, types.Todo{Title: todo, IsDone: isDone})
+
+		// myTodoList.Todos = append(myTodoList.Todos, types.Todo{Title: todo, IsDone: isDone})
+		todosNew := &(myTodoList.Todos)
+		*todosNew = append(*todosNew, types.Todo{Title: todo, IsDone: isDone})
+
+		// Write to json file
+		todosJson, _ := json.MarshalIndent(todosNew, "", "\t")
+		writeJsonFile(JSON_FILE_PATH, string(todosJson))
+
 		http.Redirect(rw, req, "/todo", http.StatusSeeOther)
 	default:
 		rw.WriteHeader(http.StatusNotFound)
@@ -120,8 +128,6 @@ func handlerTodoList(rw http.ResponseWriter, req *http.Request) {
 
 		// Write to json file
 		todosJson, _ := json.MarshalIndent(todosNew, "", "\t")
-		log.Printf("Shit")
-		log.Println(string(todosJson))
 		writeJsonFile(JSON_FILE_PATH, string(todosJson))
 
 		// Redirect
