@@ -1,0 +1,5 @@
+[
+  { "Title": "Task A", "IsDone": false },
+  { "Title": "Task B", "IsDone": true },
+  { "Title": "Task C", "IsDone": true }
+]
