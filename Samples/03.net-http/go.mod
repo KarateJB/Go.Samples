@@ -5,6 +5,6 @@ go 1.15
 replace types => ./types
 
 require (
-	golang.org/x/tools v0.1.10 // indirect
+	github.com/allegro/bigcache/v3 v3.0.2
 	types v1.1.0
 )

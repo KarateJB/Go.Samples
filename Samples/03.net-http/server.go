@@ -9,15 +9,23 @@ import (
 	"os"
 	"strconv"
 	"text/template"
+	"time"
 	"types"
+
+	"github.com/allegro/bigcache/v3"
 )
 
 var counter int
 var myTodoList types.TodoPageData
 
+var cache *bigcache.BigCache
+
 const JSON_FILE_PATH = "./files/todo-list.json"
 
 func main() {
+	// Init cache
+	cache, _ = bigcache.NewBigCache(bigcache.DefaultConfig(10 * time.Minute))
+
 	// Read json file as bytes
 	bytes := readJsonFile(JSON_FILE_PATH)
 
@@ -107,6 +115,7 @@ func handlerTodoList(rw http.ResponseWriter, req *http.Request) {
 		tmpl := template.Must(template.New("todo-list.html").Funcs(template.FuncMap{"inc": inc}).ParseFiles("./header.html", "./todo-list.html"))
 		// tmpl := template.Must(template.Must(template.ParseFiles("./todo-list.html")).ParseFiles("./header.html"))
 		tmpl.Execute(rw, myTodoList)
+
 	case "POST":
 		if err := req.ParseForm(); err != nil {
 			fmt.Fprintf(rw, "ParseForm() err: %v", err)
@@ -140,6 +149,19 @@ func handlerTodoList(rw http.ResponseWriter, req *http.Request) {
 // inc: increment by 1
 func inc(i int) int {
 	return i + 1
+}
+
+// Use the cached data
+func readOrSetcache() {
+	myTodoListCache, _ := cache.Get("TodoList")
+	if myTodoListCache == nil {
+		cacheJsonStr, _ := json.Marshal(myTodoList)
+		cache.Set("TodoList", []byte(string(cacheJsonStr)))
+		log.Printf("Set cache")
+	} else {
+		json.Unmarshal([]byte(myTodoListCache), &myTodoList)
+		log.Printf("Read cache")
+	}
 }
 
 // readJsonFile: read json file as bytes
