@@ -23,6 +23,7 @@ func main() {
 	// Init Gin router
 	router := gin.Default()
 	router.GET("api/todo", getTodoList)
+	router.GET("api/todo/:id", getTodo)
 	router.POST("api/todo/create", postTodoList)
 	// router.GET("/todo/create")
 
@@ -34,6 +35,22 @@ func getTodoList(c *gin.Context) {
 
 	// Serialize myTodoList to json and add it to reponse
 	c.IndentedJSON(http.StatusOK, myTodoList)
+}
+
+// getTodo: The handler for response the TODO by Id
+func getTodo(c *gin.Context) {
+	id := c.Param("id") // Get the value from api/todo/:id
+
+	// Search the matched TODO from the list by Id
+	for _, todo := range myTodoList.Todos {
+		if todo.Id.String() == id {
+			c.IndentedJSON(http.StatusOK, todo)
+			return
+		}
+	}
+
+	// If not found, response 204
+	c.Writer.WriteHeader(http.StatusNoContent)
 }
 
 // postTodoList: The handler to add new TODO to TODO list
