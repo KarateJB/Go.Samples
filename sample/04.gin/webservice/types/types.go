@@ -1,8 +1,11 @@
 package types
 
+import "github.com/google/uuid"
+
 type Todo struct {
-	Title  string `json:"title"`
-	IsDone bool   `json:"isDone"`
+	Id     uuid.UUID `json:"id"`
+	Title  string    `json:"title"`
+	IsDone bool      `json:"isDone"`
 }
 
 type TodoPageData struct {
