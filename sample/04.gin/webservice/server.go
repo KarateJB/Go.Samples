@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"golang.org/x/exp/slices"
 )
 
 var myTodoList types.TodoPageData
@@ -24,7 +25,8 @@ func main() {
 	router := gin.Default()
 	router.GET("api/todo", getTodoList)
 	router.GET("api/todo/:id", getTodo)
-	router.POST("api/todo/create", postTodoList)
+	router.POST("api/todo/create", postTodo)
+	router.DELETE("api/todo/remove", deleteTodo)
 	// router.GET("/todo/create")
 
 	router.Run("localhost:8001")
@@ -53,14 +55,29 @@ func getTodo(c *gin.Context) {
 	c.Writer.WriteHeader(http.StatusNoContent)
 }
 
-// postTodoList: The handler to add new TODO to TODO list
-func postTodoList(c *gin.Context) {
+// postTodo: The handler to add new TODO to TODO list
+func postTodo(c *gin.Context) {
 	var newTodo types.Todo
 	if err := c.BindJSON(&newTodo); err != nil {
-		// log.Fatal(err)
-		return
+		// return
+		c.Writer.WriteHeader(http.StatusBadRequest)
 	}
 	newTodo.Id = uuid.New() // Set Id
 	myTodoList.Todos = append(myTodoList.Todos, newTodo)
 	c.IndentedJSON(http.StatusCreated, newTodo)
+}
+
+// deleteTodo: The handler to delete an exist TODO from TODO list
+func deleteTodo(c *gin.Context) {
+	var deleteTodo types.Todo
+	if err := c.BindJSON(&deleteTodo); err != nil {
+		c.Writer.WriteHeader(http.StatusBadRequest)
+	}
+
+	removeIndex := slices.Index(myTodoList.Todos, deleteTodo)
+	if removeIndex >= 0 {
+		slices.Delete(myTodoList.Todos, removeIndex, removeIndex+1)
+	} else {
+		c.Writer.WriteHeader(http.StatusUnprocessableEntity)
+	}
 }
