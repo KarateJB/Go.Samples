@@ -15,9 +15,9 @@ func main() {
 	myTodoList = types.TodoPageData{
 		PageTitle: "My TODO list",
 		Todos: []types.Todo{
-			{Id: uuid.New(), Title: "Task A", IsDone: false},
-			{Id: uuid.New(), Title: "Task B", IsDone: true},
-			{Id: uuid.New(), Title: "Task C", IsDone: true},
+			{Id: uuid.MustParse("aa3cdd2f-17b9-4f43-9eb0-af56b42908c5"), Title: "Task A", IsDone: false},
+			{Id: uuid.MustParse("bbf5d05c-c442-4869-8326-ab5cfa832f6a"), Title: "Task B", IsDone: true},
+			{Id: uuid.MustParse("cca89c32-a0d9-43c9-84e2-ae1224c5d755"), Title: "Task C", IsDone: true},
 		},
 	}
 
@@ -26,8 +26,8 @@ func main() {
 	router.GET("api/todo", getTodoList)
 	router.GET("api/todo/:id", getTodo)
 	router.POST("api/todo/create", postTodo)
+	router.PUT("api/todo/edit", putTodo)
 	router.DELETE("api/todo/remove", deleteTodo)
-	// router.GET("/todo/create")
 
 	router.Run("localhost:8001")
 }
@@ -65,6 +65,28 @@ func postTodo(c *gin.Context) {
 	newTodo.Id = uuid.New() // Set Id
 	myTodoList.Todos = append(myTodoList.Todos, newTodo)
 	c.IndentedJSON(http.StatusCreated, newTodo)
+}
+
+// putTodo: The handler to edit a TODO
+func putTodo(c *gin.Context) {
+	var editTodo types.Todo
+	if err := c.BindJSON(&editTodo); err != nil {
+		c.Writer.WriteHeader(http.StatusBadRequest)
+	}
+
+	for index, todo := range myTodoList.Todos {
+		if todo.Id == editTodo.Id {
+			myTodoList.Todos[index].Title, myTodoList.Todos[index].IsDone = editTodo.Title, editTodo.IsDone
+
+			// range copies the values from the slice that iterated over, so below code wont work.
+			// todo.Title = editTodo.Title
+			// todo.IsDone = editTodo.IsDone
+
+			return
+		}
+	}
+
+	c.Writer.WriteHeader(http.StatusBadRequest)
 }
 
 // deleteTodo: The handler to delete an exist TODO from TODO list
