@@ -74,9 +74,22 @@ func deleteTodo(c *gin.Context) {
 		c.Writer.WriteHeader(http.StatusBadRequest)
 	}
 
-	removeIndex := slices.Index(myTodoList.Todos, deleteTodo)
+	removeIndex := slices.Index(myTodoList.Todos, deleteTodo) // We can find the index if the request contains the full values of the item.
+
+	// But if we only has ID from the request, then get the index by comparing the Id.
+	if removeIndex < 0 {
+		for index, todo := range myTodoList.Todos {
+			if todo.Id == deleteTodo.Id {
+				removeIndex = index
+				break
+			}
+		}
+	}
+
+	// Try removing the TODO from list
 	if removeIndex >= 0 {
-		slices.Delete(myTodoList.Todos, removeIndex, removeIndex+1)
+		myTodoList.Todos = slices.Delete(myTodoList.Todos, removeIndex, removeIndex+1)
+		// fmt.Println(myTodoList)
 	} else {
 		c.Writer.WriteHeader(http.StatusUnprocessableEntity)
 	}
