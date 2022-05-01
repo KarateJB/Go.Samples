@@ -1,11 +1,14 @@
 package main
 
 import (
+	"example/webservice/docs"
 	"net/http"
 	"types"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	swagger "github.com/swaggo/gin-swagger"
+	swaggerfiles "github.com/swaggo/gin-swagger/swaggerFiles"
 	"golang.org/x/exp/slices"
 )
 
@@ -34,6 +37,12 @@ func main() {
 	router.POST("api/todo", postTodo)
 	router.PUT("api/todo", putTodo)
 	router.DELETE("api/todo", deleteTodo)
+
+	// Swagger
+	docs.SwaggerInfo.BasePath = "/api/v1"
+	// url := ginSwagger.URL("http://localhost:8080/swagger/doc.json") // The url pointing to API definition
+	// router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+	router.GET("/swagger/*any", swagger.WrapHandler(swaggerfiles.Handler))
 
 	router.Run("localhost:8001")
 }
