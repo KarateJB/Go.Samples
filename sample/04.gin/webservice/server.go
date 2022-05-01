@@ -43,7 +43,7 @@ func getTodoList(c *gin.Context) {
 func getTodo(c *gin.Context) {
 	id := c.Param("id") // Get the value from api/todo/:id
 
-	// Search the matched TODO from the list by Id
+	// Search the matched TODO from the list by Id.
 	for _, todo := range myTodoList.Todos {
 		if todo.Id.String() == id {
 			c.IndentedJSON(http.StatusOK, todo)
@@ -96,7 +96,8 @@ func deleteTodo(c *gin.Context) {
 		c.Writer.WriteHeader(http.StatusBadRequest)
 	}
 
-	removeIndex := slices.Index(myTodoList.Todos, deleteTodo) // We can find the index if the request contains the full values of the item.
+	// We can find the index if the request contains the full values of the item.
+	removeIndex := slices.Index(myTodoList.Todos, deleteTodo)
 
 	// But if we only has ID from the request, then get the index by comparing the Id.
 	if removeIndex < 0 {
