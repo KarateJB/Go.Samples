@@ -41,8 +41,8 @@ func main() {
 // @Title Get TODO list
 // @Version 1.0
 // @Description The handler to response the TODO list
-// @Router /api/todo
-// @Success 200 {types.TodoPageData}
+// @Router /api/todo [get]
+// @Success 200 {} types.TodoPageData
 // getTodoList: The handler to response the TODO list
 func getTodoList(c *gin.Context) {
 
@@ -54,8 +54,8 @@ func getTodoList(c *gin.Context) {
 // @Version 1.0
 // @Description The handler for response the TODO by Id
 // @Router /api/todo/:id [get]
-// @Success 200 {types.Todo}
-// @Success 204
+// @Success 200 ""
+// @Success 204 ""
 // getTodo: The handler for response the TODO by Id
 func getTodo(c *gin.Context) {
 	id := c.Param("id") // Get the value from api/todo/:id
@@ -76,7 +76,7 @@ func getTodo(c *gin.Context) {
 // @Version 1.0
 // @Description The handler to add new TODO to TODO list
 // @Router /api/todo [post]
-// @Success 201 {types.Todo}
+// @Success 201 {} types.Todo
 // @Failure 401
 // postTodo: The handler to add new TODO to TODO list
 func postTodo(c *gin.Context) {
@@ -94,7 +94,7 @@ func postTodo(c *gin.Context) {
 // @Version 1.0
 // @Description The handler to edit a TODO
 // @Router /api/todo [put]
-// @Success 200
+// @Success 200 {} types.Todo
 // @Failure 401
 // putTodo: The handler to edit a TODO
 func putTodo(c *gin.Context) {
@@ -122,7 +122,7 @@ func putTodo(c *gin.Context) {
 // @Version 1.0
 // @Description The handler to delete an exist TODO from TODO list
 // @Router /api/todo [delete]
-// @Success 200
+// @Success 200 {} types.Todo
 // @Failure 401
 // @Failure 422
 // deleteTodo: The handler to delete an exist TODO from TODO list

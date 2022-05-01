@@ -29,3 +29,32 @@ $ curl -X DELETE "http://localhost:8001/api/todo" --include --header "Content-Ty
 
 $ curl -X DELETE "http://localhost:8001/api/todo" --include --header "Content-Type: application/json" --data '{"id": "bbf5d05c-c442-4869-8326-ab5cfa832f6a"}'
 ```
+
+
+# Swagger
+
+## Install swag
+
+> GitHub: [swag](https://github.com/swaggo/swag)
+
+```s
+$ go get -u github.com/swaggo/swag/cmd/swag
+
+# 1.16 or newer
+$ go install github.com/swaggo/swag/cmd/swag@latest
+```
+
+
+## swag init
+
+```s
+# Default: main.go
+$ swag init
+
+# Or specified file name
+$ swag init -g|--generalInfo server.go
+2022/05/02 01:53:36 Generate swagger docs....
+2022/05/02 01:53:36 Generate general API Info, search dir:./
+2022/05/02 01:53:37 create docs.go at  docs/docs.go
+2022/05/02 01:53:37 create swagger.json at  docs/swagger.json
+2022/05/02 01:53:37 create swagger.yaml at  docs/swagger.yaml```

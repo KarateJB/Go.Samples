@@ -1,0 +1,57 @@
+consumes:
+- application/json
+host: localhost:8001
+info:
+  contact: {}
+  description: TODO API sample by Gin
+  title: TODO API
+  version: "1.0"
+paths:
+  /api/todo:
+    delete:
+      description: The handler to delete an exist TODO from TODO list
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: ""
+        "401":
+          description: ""
+        "422":
+          description: ""
+    get:
+      description: The handler to response the TODO list
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: ""
+    post:
+      description: The handler to add new TODO to TODO list
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: ""
+        "401":
+          description: ""
+    put:
+      description: The handler to edit a TODO
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: ""
+        "401":
+          description: ""
+  /api/todo/:id:
+    get:
+      description: The handler for response the TODO by Id
+      responses:
+        "200":
+          description: ""
+        "204":
+          description: ""
+produces:
+- application/json
+swagger: "2.0"

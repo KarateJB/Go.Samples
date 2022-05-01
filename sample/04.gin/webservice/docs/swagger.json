@@ -1,0 +1,89 @@
+{
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "TODO API sample by Gin",
+        "title": "TODO API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8001",
+    "paths": {
+        "/api/todo": {
+            "get": {
+                "description": "The handler to response the TODO list",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": ""
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "The handler to edit a TODO",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": ""
+                        }
+                    },
+                    "401": {
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "description": "The handler to add new TODO to TODO list",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": ""
+                        }
+                    },
+                    "401": {
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "description": "The handler to delete an exist TODO from TODO list",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": ""
+                        }
+                    },
+                    "401": {
+                        "description": ""
+                    },
+                    "422": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/todo/:id": {
+            "get": {
+                "description": "The handler for response the TODO by Id",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "204": {
+                        "description": ""
+                    }
+                }
+            }
+        }
+    }
+}
