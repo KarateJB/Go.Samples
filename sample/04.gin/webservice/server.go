@@ -11,6 +11,12 @@ import (
 
 var myTodoList types.TodoPageData
 
+// @Title TODO API
+// @Version 1.0
+// @Description TODO API sample by Gin
+// @Accept json
+// @Produce json
+// @Host localhost:8001
 func main() {
 	myTodoList = types.TodoPageData{
 		PageTitle: "My TODO list",
@@ -25,13 +31,18 @@ func main() {
 	router := gin.Default()
 	router.GET("api/todo", getTodoList)
 	router.GET("api/todo/:id", getTodo)
-	router.POST("api/todo/create", postTodo)
-	router.PUT("api/todo/edit", putTodo)
-	router.DELETE("api/todo/remove", deleteTodo)
+	router.POST("api/todo", postTodo)
+	router.PUT("api/todo", putTodo)
+	router.DELETE("api/todo", deleteTodo)
 
 	router.Run("localhost:8001")
 }
 
+// @Title Get TODO list
+// @Version 1.0
+// @Description The handler to response the TODO list
+// @Router /api/todo
+// @Success 200 {types.TodoPageData}
 // getTodoList: The handler to response the TODO list
 func getTodoList(c *gin.Context) {
 
@@ -39,6 +50,12 @@ func getTodoList(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, myTodoList)
 }
 
+// @Title Get a TODO by its Id
+// @Version 1.0
+// @Description The handler for response the TODO by Id
+// @Router /api/todo/:id [get]
+// @Success 200 {types.Todo}
+// @Success 204
 // getTodo: The handler for response the TODO by Id
 func getTodo(c *gin.Context) {
 	id := c.Param("id") // Get the value from api/todo/:id
@@ -55,6 +72,12 @@ func getTodo(c *gin.Context) {
 	c.Writer.WriteHeader(http.StatusNoContent)
 }
 
+// @Title Create a new TODO
+// @Version 1.0
+// @Description The handler to add new TODO to TODO list
+// @Router /api/todo [post]
+// @Success 201 {types.Todo}
+// @Failure 401
 // postTodo: The handler to add new TODO to TODO list
 func postTodo(c *gin.Context) {
 	var newTodo types.Todo
@@ -67,6 +90,12 @@ func postTodo(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, newTodo)
 }
 
+// @Title Edit a TODO
+// @Version 1.0
+// @Description The handler to edit a TODO
+// @Router /api/todo [put]
+// @Success 200
+// @Failure 401
 // putTodo: The handler to edit a TODO
 func putTodo(c *gin.Context) {
 	var editTodo types.Todo
@@ -89,6 +118,13 @@ func putTodo(c *gin.Context) {
 	c.Writer.WriteHeader(http.StatusBadRequest)
 }
 
+// @Title Delete a TODO
+// @Version 1.0
+// @Description The handler to delete an exist TODO from TODO list
+// @Router /api/todo [delete]
+// @Success 200
+// @Failure 401
+// @Failure 422
 // deleteTodo: The handler to delete an exist TODO from TODO list
 func deleteTodo(c *gin.Context) {
 	var deleteTodo types.Todo
