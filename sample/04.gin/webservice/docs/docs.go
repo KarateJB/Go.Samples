@@ -6,17 +6,15 @@ import "github.com/swaggo/swag"
 
 const docTemplate = `{
     "schemes": {{ marshal .Schemes }},
-    "consumes": [
-        "application/json"
-    ],
-    "produces": [
-        "application/json"
-    ],
     "swagger": "2.0",
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "contact": {
+            "name": "JB",
+            "url": "https://karatejb.blogspot.com/",
+            "email": "xxx@demo.com"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -25,70 +23,169 @@ const docTemplate = `{
         "/api/todo": {
             "get": {
                 "description": "The handler to response the TODO list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": ""
+                            "$ref": "#/definitions/types.TodoPageData"
                         }
                     }
                 }
             },
             "put": {
                 "description": "The handler to edit a TODO",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "The TODO to be edited.",
+                        "name": "\"todo\"",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.Todo"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": ""
-                        }
+                        "description": "OK"
                     },
-                    "401": {
-                        "description": ""
+                    "400": {
+                        "description": "Bad Request"
                     }
                 }
             },
             "post": {
-                "description": "The handler to add new TODO to TODO list",
+                "description": "The handler to add a new TODO",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "The new TODO to be created.",
+                        "name": "\"todo\"",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.TodoPageData"
+                        }
+                    }
+                ],
                 "responses": {
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "type": ""
+                            "$ref": "#/definitions/types.Todo"
                         }
                     },
-                    "401": {
-                        "description": ""
+                    "400": {
+                        "description": "Bad Request"
                     }
                 }
             },
             "delete": {
                 "description": "The handler to delete an exist TODO from TODO list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "The TODO to be deleted.",
+                        "name": "\"todo\"",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.Todo"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": ""
-                        }
+                        "description": "OK"
                     },
-                    "401": {
-                        "description": ""
+                    "400": {
+                        "description": "Bad Request"
                     },
                     "422": {
-                        "description": ""
+                        "description": "Unprocessable Entity"
                     }
                 }
             }
         },
-        "/api/todo/:id": {
+        "/api/todo/{id}": {
             "get": {
                 "description": "The handler for response the TODO by Id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "A TODO's Id.",
+                        "name": "\"id\"",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.Todo"
+                        }
                     },
                     "204": {
-                        "description": ""
+                        "description": "No Content"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "types.Todo": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "isDone": {
+                    "type": "boolean"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.TodoPageData": {
+            "type": "object",
+            "properties": {
+                "pageTitle": {
+                    "type": "string"
+                },
+                "todos": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/types.Todo"
                     }
                 }
             }
@@ -100,7 +197,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:8001",
-	BasePath:         "",
+	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "TODO API",
 	Description:      "TODO API sample by Gin",

@@ -17,9 +17,11 @@ var myTodoList types.TodoPageData
 // @Title TODO API
 // @Version 1.0
 // @Description TODO API sample by Gin
-// @Accept json
-// @Produce json
 // @Host localhost:8001
+// @BasePath /
+// @Contact.Name JB
+// @Contact.Url https://karatejb.blogspot.com/
+// @Contact.Email xxx@demo.com
 func main() {
 	myTodoList = types.TodoPageData{
 		PageTitle: "My TODO list",
@@ -38,20 +40,26 @@ func main() {
 	router.PUT("api/todo", putTodo)
 	router.DELETE("api/todo", deleteTodo)
 
-	// Swagger
-	docs.SwaggerInfo.BasePath = "/api/v1"
+	// Swagger configuration (that will overwrites the General API annotations on main().
+	docs.SwaggerInfo.BasePath = "/"
+	docs.SwaggerInfo.Schemes = []string{"http", "https"}
+	docs.SwaggerInfo.Title = "TODO API"
+	docs.SwaggerInfo.Description = "TODO API sample by Gin"
+	docs.SwaggerInfo.Version = "1.0"
+	docs.SwaggerInfo.Host = "localhost:8001"
+	router.GET("/swagger/*any", swagger.WrapHandler(swaggerfiles.Handler))
 	// url := ginSwagger.URL("http://localhost:8080/swagger/doc.json") // The url pointing to API definition
 	// router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
-	router.GET("/swagger/*any", swagger.WrapHandler(swaggerfiles.Handler))
 
 	router.Run("localhost:8001")
 }
 
 // @Title Get TODO list
-// @Version 1.0
 // @Description The handler to response the TODO list
 // @Router /api/todo [get]
-// @Success 200 {} types.TodoPageData
+// @Accept json
+// @Produce json
+// @Success 200 {object} types.TodoPageData "OK"
 // getTodoList: The handler to response the TODO list
 func getTodoList(c *gin.Context) {
 
@@ -60,11 +68,13 @@ func getTodoList(c *gin.Context) {
 }
 
 // @Title Get a TODO by its Id
-// @Version 1.0
 // @Description The handler for response the TODO by Id
-// @Router /api/todo/:id [get]
-// @Success 200 ""
-// @Success 204 ""
+// @Router /api/todo/{id} [get]
+// @Param "id" path string true "A TODO's Id."
+// @Accept json
+// @Produce json
+// @Success 200 {object} types.Todo "OK"
+// @Success 204 "No Content"
 // getTodo: The handler for response the TODO by Id
 func getTodo(c *gin.Context) {
 	id := c.Param("id") // Get the value from api/todo/:id
@@ -82,12 +92,14 @@ func getTodo(c *gin.Context) {
 }
 
 // @Title Create a new TODO
-// @Version 1.0
-// @Description The handler to add new TODO to TODO list
+// @Description The handler to add a new TODO
 // @Router /api/todo [post]
-// @Success 201 {} types.Todo
-// @Failure 401
-// postTodo: The handler to add new TODO to TODO list
+// @Param "todo" body types.TodoPageData true "The new TODO to be created."
+// @Accept json
+// @Produce json
+// @Success 201 {object} types.Todo
+// @Failure 400 "Bad Request"
+// postTodo: The handler to add a new TODO
 func postTodo(c *gin.Context) {
 	var newTodo types.Todo
 	if err := c.BindJSON(&newTodo); err != nil {
@@ -100,11 +112,13 @@ func postTodo(c *gin.Context) {
 }
 
 // @Title Edit a TODO
-// @Version 1.0
 // @Description The handler to edit a TODO
 // @Router /api/todo [put]
-// @Success 200 {} types.Todo
-// @Failure 401
+// @Param "todo" body types.Todo true "The TODO to be edited."
+// @Accept json
+// @Produce json
+// @Success 200 "OK"
+// @Failure 400 "Bad Request"
 // putTodo: The handler to edit a TODO
 func putTodo(c *gin.Context) {
 	var editTodo types.Todo
@@ -128,12 +142,14 @@ func putTodo(c *gin.Context) {
 }
 
 // @Title Delete a TODO
-// @Version 1.0
 // @Description The handler to delete an exist TODO from TODO list
 // @Router /api/todo [delete]
-// @Success 200 {} types.Todo
-// @Failure 401
-// @Failure 422
+// @Param "todo" body types.Todo true "The TODO to be deleted."
+// @Accept json
+// @Produce json
+// @Success 200 "OK"
+// @Failure 400 "Bad Request"
+// @Failure 422 "Unprocessable Entity"
 // deleteTodo: The handler to delete an exist TODO from TODO list
 func deleteTodo(c *gin.Context) {
 	var deleteTodo types.Todo

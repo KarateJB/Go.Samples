@@ -1,57 +1,121 @@
-consumes:
-- application/json
+basePath: /
+definitions:
+  types.Todo:
+    properties:
+      id:
+        type: string
+      isDone:
+        type: boolean
+      title:
+        type: string
+    type: object
+  types.TodoPageData:
+    properties:
+      pageTitle:
+        type: string
+      todos:
+        items:
+          $ref: '#/definitions/types.Todo'
+        type: array
+    type: object
 host: localhost:8001
 info:
-  contact: {}
+  contact:
+    email: xxx@demo.com
+    name: JB
+    url: https://karatejb.blogspot.com/
   description: TODO API sample by Gin
   title: TODO API
   version: "1.0"
 paths:
   /api/todo:
     delete:
+      consumes:
+      - application/json
       description: The handler to delete an exist TODO from TODO list
+      parameters:
+      - description: The TODO to be deleted.
+        in: body
+        name: '"todo"'
+        required: true
+        schema:
+          $ref: '#/definitions/types.Todo'
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
-          schema:
-            type: ""
-        "401":
-          description: ""
+        "400":
+          description: Bad Request
         "422":
-          description: ""
+          description: Unprocessable Entity
     get:
+      consumes:
+      - application/json
       description: The handler to response the TODO list
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            type: ""
+            $ref: '#/definitions/types.TodoPageData'
     post:
-      description: The handler to add new TODO to TODO list
+      consumes:
+      - application/json
+      description: The handler to add a new TODO
+      parameters:
+      - description: The new TODO to be created.
+        in: body
+        name: '"todo"'
+        required: true
+        schema:
+          $ref: '#/definitions/types.TodoPageData'
+      produces:
+      - application/json
       responses:
         "201":
           description: Created
           schema:
-            type: ""
-        "401":
-          description: ""
+            $ref: '#/definitions/types.Todo'
+        "400":
+          description: Bad Request
     put:
+      consumes:
+      - application/json
       description: The handler to edit a TODO
+      parameters:
+      - description: The TODO to be edited.
+        in: body
+        name: '"todo"'
+        required: true
+        schema:
+          $ref: '#/definitions/types.Todo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+  /api/todo/{id}:
+    get:
+      consumes:
+      - application/json
+      description: The handler for response the TODO by Id
+      parameters:
+      - description: A TODO's Id.
+        in: path
+        name: '"id"'
+        required: true
+        type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            type: ""
-        "401":
-          description: ""
-  /api/todo/:id:
-    get:
-      description: The handler for response the TODO by Id
-      responses:
-        "200":
-          description: ""
+            $ref: '#/definitions/types.Todo'
         "204":
-          description: ""
-produces:
-- application/json
+          description: No Content
 swagger: "2.0"
