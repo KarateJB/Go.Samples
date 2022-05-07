@@ -48,8 +48,8 @@ func main() {
 	docs.SwaggerInfo.Version = "1.0"
 	docs.SwaggerInfo.Host = "localhost:8001"
 	router.GET("/swagger/*any", swagger.WrapHandler(swaggerfiles.Handler))
-	// url := ginSwagger.URL("http://localhost:8080/swagger/doc.json") // The url pointing to API definition
-	// router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+	// url := swagger.URL("https://petstore.swagger.io/v2/swagger.json") // The url pointing to API definition
+	// router.GET("/swagger/*any", swagger.WrapHandler(swaggerfiles.Handler, url))
 
 	router.Run("localhost:8001")
 }
