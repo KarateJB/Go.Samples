@@ -49,7 +49,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "The TODO to be edited.",
-                        "name": "\"todo\"",
+                        "name": "todo",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -77,7 +77,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "The new TODO to be created.",
-                        "name": "\"todo\"",
+                        "name": "todo",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -108,7 +108,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "The TODO to be deleted.",
-                        "name": "\"todo\"",
+                        "name": "todo",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -129,9 +129,43 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/todo/search": {
+            "get": {
+                "description": "The handler for searching the TODOs by Title and IsDone",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Contained keyword for TODO's Title.",
+                        "name": "title",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Matched value for TODO's IsDone.",
+                        "name": "isDone",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.TodoPageData"
+                        }
+                    }
+                }
+            }
+        },
         "/api/todo/{id}": {
             "get": {
-                "description": "The handler for response the TODO by Id",
+                "description": "The handler for getting the TODO by Id",
                 "consumes": [
                     "application/json"
                 ],
@@ -142,7 +176,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "A TODO's Id.",
-                        "name": "\"id\"",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
