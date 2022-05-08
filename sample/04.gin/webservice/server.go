@@ -3,6 +3,8 @@ package main
 import (
 	"example/webservice/docs"
 	"net/http"
+	"strconv"
+	"strings"
 	"types"
 
 	"github.com/gin-gonic/gin"
@@ -35,7 +37,9 @@ func main() {
 	// Init Gin router
 	router := gin.Default()
 	router.GET("api/todo", getTodoList)
-	router.GET("api/todo/:id", getTodo)
+	router.GET("api/todo/:id", getTodo) // The id is required for matching this routing
+	// router.GET("api/todo/*id", getTodoById) // The id is optional for matching this routing, e.q. api/todo/ or api/todo/xxx
+	router.GET("api/todo/search", searchTodo)
 	router.POST("api/todo", postTodo)
 	router.PUT("api/todo", putTodo)
 	router.DELETE("api/todo", deleteTodo)
@@ -68,14 +72,14 @@ func getTodoList(c *gin.Context) {
 }
 
 // @Title Get a TODO by its Id
-// @Description The handler for response the TODO by Id
+// @Description The handler for getting the TODO by Id
 // @Router /api/todo/{id} [get]
 // @Param "id" path string true "A TODO's Id."
 // @Accept json
 // @Produce json
 // @Success 200 {object} types.Todo "OK"
 // @Success 204 "No Content"
-// getTodo: The handler for response the TODO by Id
+// getTodo: The handler for getting the TODO by Id
 func getTodo(c *gin.Context) {
 	id := c.Param("id") // Get the value from api/todo/:id
 
@@ -89,6 +93,24 @@ func getTodo(c *gin.Context) {
 
 	// If not found, response 204
 	c.Writer.WriteHeader(http.StatusNoContent)
+}
+
+// getTodoByTitle: The handler for searching the TODOs by title and isDone
+func searchTodo(c *gin.Context) {
+	queryValIsDone, _ := strconv.ParseBool(c.DefaultQuery("isDone", "false"))
+	queryValTitle := c.Query("title")
+
+	matchedTodoList := new(types.TodoPageData)
+	matchedTodoList.PageTitle = myTodoList.PageTitle
+
+	for _, todo := range myTodoList.Todos {
+		if todo.IsDone == queryValIsDone && strings.Contains(todo.Title, queryValTitle) {
+			matchedTodoList.Todos = append(matchedTodoList.Todos, todo)
+		}
+	}
+
+	// Serialize myTodoList to json and add it to reponse
+	c.IndentedJSON(http.StatusOK, matchedTodoList)
 }
 
 // @Title Create a new TODO

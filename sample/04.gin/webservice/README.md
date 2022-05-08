@@ -2,11 +2,26 @@
 
 ### GET
 
+`To get all TODOs`
+
 ```s
 $ curl http://localhost:8001/api/todo
+```
 
+`Get a TODO by Id`
+
+```s
 $ curl http://localhost:8001/api/todo/aa3cdd2f-17b9-4f43-9eb0-af56b42908c5
 ```
+
+`Search TODOs by Title and IsDone`
+
+```s
+$ curl http://localhost:8001/api/todo/search?title=Task%20A
+$ curl http://localhost:8001/api/todo/search?title=Task&isDone=true
+$ curl http://localhost:8001/api/todo/search?title=B&isDone=true
+```
+
 
 ### POST
 
