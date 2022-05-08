@@ -36,7 +36,7 @@ paths:
       parameters:
       - description: The TODO to be deleted.
         in: body
-        name: '"todo"'
+        name: todo
         required: true
         schema:
           $ref: '#/definitions/types.Todo'
@@ -67,7 +67,7 @@ paths:
       parameters:
       - description: The new TODO to be created.
         in: body
-        name: '"todo"'
+        name: todo
         required: true
         schema:
           $ref: '#/definitions/types.TodoPageData'
@@ -87,7 +87,7 @@ paths:
       parameters:
       - description: The TODO to be edited.
         in: body
-        name: '"todo"'
+        name: todo
         required: true
         schema:
           $ref: '#/definitions/types.Todo'
@@ -102,11 +102,11 @@ paths:
     get:
       consumes:
       - application/json
-      description: The handler for response the TODO by Id
+      description: The handler for getting the TODO by Id
       parameters:
       - description: A TODO's Id.
         in: path
-        name: '"id"'
+        name: id
         required: true
         type: string
       produces:
@@ -118,4 +118,26 @@ paths:
             $ref: '#/definitions/types.Todo'
         "204":
           description: No Content
+  /api/todo/search:
+    get:
+      consumes:
+      - application/json
+      description: The handler for searching the TODOs by Title and IsDone
+      parameters:
+      - description: Contained keyword for TODO's Title.
+        in: query
+        name: title
+        type: string
+      - default: false
+        description: Matched value for TODO's IsDone.
+        in: query
+        name: isDone
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.TodoPageData'
 swagger: "2.0"

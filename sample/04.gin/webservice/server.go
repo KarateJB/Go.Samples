@@ -74,7 +74,7 @@ func getTodoList(c *gin.Context) {
 // @Title Get a TODO by its Id
 // @Description The handler for getting the TODO by Id
 // @Router /api/todo/{id} [get]
-// @Param "id" path string true "A TODO's Id."
+// @Param id path string true "A TODO's Id."
 // @Accept json
 // @Produce json
 // @Success 200 {object} types.Todo "OK"
@@ -95,7 +95,15 @@ func getTodo(c *gin.Context) {
 	c.Writer.WriteHeader(http.StatusNoContent)
 }
 
-// getTodoByTitle: The handler for searching the TODOs by title and isDone
+// @Title Search TODOs
+// @Description The handler for searching the TODOs by Title and IsDone
+// @Router /api/todo/search [get]
+// @Param title query string false "Contained keyword for TODO's Title."
+// @Param isDone query boolean false "Matched value for TODO's IsDone." default(false)
+// @Accept json
+// @Produce json
+// @Success 200 {object} types.TodoPageData "OK"
+// searchTodo: The handler for searching the TODOs by title and isDone
 func searchTodo(c *gin.Context) {
 	queryValIsDone, _ := strconv.ParseBool(c.DefaultQuery("isDone", "false"))
 	queryValTitle := c.Query("title")
@@ -116,7 +124,7 @@ func searchTodo(c *gin.Context) {
 // @Title Create a new TODO
 // @Description The handler to add a new TODO
 // @Router /api/todo [post]
-// @Param "todo" body types.TodoPageData true "The new TODO to be created."
+// @Param todo body types.TodoPageData true "The new TODO to be created."
 // @Accept json
 // @Produce json
 // @Success 201 {object} types.Todo
@@ -136,7 +144,7 @@ func postTodo(c *gin.Context) {
 // @Title Edit a TODO
 // @Description The handler to edit a TODO
 // @Router /api/todo [put]
-// @Param "todo" body types.Todo true "The TODO to be edited."
+// @Param todo body types.Todo true "The TODO to be edited."
 // @Accept json
 // @Produce json
 // @Success 200 "OK"
@@ -166,7 +174,7 @@ func putTodo(c *gin.Context) {
 // @Title Delete a TODO
 // @Description The handler to delete an exist TODO from TODO list
 // @Router /api/todo [delete]
-// @Param "todo" body types.Todo true "The TODO to be deleted."
+// @Param todo body types.Todo true "The TODO to be deleted."
 // @Accept json
 // @Produce json
 // @Success 200 "OK"
