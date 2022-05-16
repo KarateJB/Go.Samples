@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"time"
 	"types"
@@ -18,7 +17,17 @@ func main() {
 		log.Fatal("Failed to connect database")
 	}
 
-	shit := types.Todo{
+	// Migrate
+	db.AutoMigrate(&types.Todo{})
+
+	// Initialize data
+	initData(db)
+}
+
+// initData: Initialize data
+func initData(db *gorm.DB) {
+	// Create
+	newTodo := types.Todo{
 		Id:     uuid.New(),
 		Title:  "Test",
 		IsDone: true,
@@ -27,15 +36,9 @@ func main() {
 			UpdatedAt: time.Now(),
 		},
 	}
-
-	fmt.Println(shit)
-
-	db.AutoMigrate(&types.Todo{})
-
-	// Create
-	// db.Create(&shit)
-	db.Create(&types.Todo{
-		Id:     uuid.MustParse("aa3cdd2f-17b9-4f43-9eb0-af56b42908c5"),
-		Title:  "Task A",
-		IsDone: false})
+	db.Create(&newTodo)
+	// db.Create(&types.Todo{
+	// 	Id:     uuid.MustParse("aa3cdd2f-17b9-4f43-9eb0-af56b42908c5"),
+	// 	Title:  "Task A",
+	// 	IsDone: false})
 }
