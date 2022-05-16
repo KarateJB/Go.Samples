@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"time"
 	"types"
@@ -46,7 +47,7 @@ func main() {
 	db.Model(&existTodo).Updates(types.Todo{
 		IsDone: true,
 		TrackDateTimes: types.TrackDateTimes{
-			UpdateOn: time.Now(),
+			UpdateOn: sql.NullTime{Time: time.Now(), Valid: true}, // Set Valid = true is optional, it will be true once we read the row from DB.
 		},
 	})
 	existTodo.Print()
