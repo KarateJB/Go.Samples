@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"time"
 	"types"
 
 	"github.com/google/uuid"
@@ -9,22 +10,53 @@ import (
 	"gorm.io/gorm"
 )
 
+var db *gorm.DB
+
 func main() {
 	dsn := "host=localhost user=postgres password=1qaz2wsx dbname=postgres port=5432 sslmode=disable TimeZone=UTC"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	openedDb, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Failed to connect database")
 	}
+	db = openedDb
 
 	// Migrate
 	db.AutoMigrate(&types.Todo{})
 
 	// Initialize data
-	initData(db)
+	initData()
+
+	// Add a TODO
+	id := uuid.MustParse("aa3cdd2f-17b9-4f43-9eb0-af56b42908c5")
+	todo := types.Todo{
+		Id:     id,
+		Title:  "Task A",
+		IsDone: false,
+	}
+	db.FirstOrCreate(&todo) // Read the record that matchs the value of "id", or insert a new row.
+	todo.Print()
+
+	// Read a TODO
+	var existTodo types.Todo
+	db.First(&existTodo, id)
+	existTodo.Print()
+
+	// Update a TODO
+	db.Model(&existTodo).Update("Title", "Task ???")
+	db.Model(&existTodo).Updates(types.Todo{
+		IsDone: true,
+		TrackDateTimes: types.TrackDateTimes{
+			UpdateOn: time.Now(),
+		},
+	})
+	existTodo.Print()
+
+	// Delete a TODO
+	db.Delete(&existTodo)
 }
 
 // initData: Initialize data
-func initData(db *gorm.DB) {
+func initData() {
 	// Create
 	newTodo := types.Todo{
 		Id:     uuid.New(),

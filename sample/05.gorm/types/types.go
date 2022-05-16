@@ -1,6 +1,8 @@
 package types
 
 import (
+	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -23,4 +25,9 @@ type Todo struct {
 // TableName: Specified table name for struct Todo
 func (Todo) TableName() string {
 	return "Todos"
+}
+
+func (m *Todo) Print() {
+	om, _ := json.MarshalIndent(m, "", "\t")
+	fmt.Printf("%s\n", string(om))
 }
