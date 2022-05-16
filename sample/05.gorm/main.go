@@ -14,7 +14,7 @@ import (
 
 var db *gorm.DB
 
-const logLevel = logger.Info // logger.Info
+const logLevel = logger.Info // logger.Silent to disable outputing SQL tracking
 
 func main() {
 	// Set database connection string
@@ -33,7 +33,7 @@ func main() {
 	initData()
 
 	// Single row handling
-	// handleSingleRow()
+	handleSingleRow()
 
 	// Multiple rows handling
 	handleMultipleRows()
@@ -107,4 +107,8 @@ func handleMultipleRows() {
 			UpdateOn: sql.NullTime{Time: time.Now(), Valid: true},
 		},
 	})
+
+	// Batch delete
+	db.Where(`"Title" LIKE ?`, "Task%").Delete(&types.Todo{})
+	// db.Delete(&types.Todo{}, `"Title" LIKE ?`, "Task%")
 }
