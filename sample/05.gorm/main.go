@@ -27,6 +27,31 @@ func main() {
 	// Initialize data
 	initData()
 
+	// Single row handling
+	handleSingleRow()
+
+	// Multiple rows handling
+	handleMultipleRows()
+}
+
+// initData: Initialize data
+func initData() {
+	// Create
+	newTodo := types.Todo{
+		Id:     uuid.New(),
+		Title:  "Test",
+		IsDone: true,
+		// Model: gorm.Model{
+		// 	CreatedAt: time.Now(),
+		// 	UpdatedAt: time.Now(),
+		// },
+	}
+	db.Create(&newTodo)
+	// db.Create(&types.Todo{...})
+}
+
+// handleSingleRow: Insert, update and delete single row samples
+func handleSingleRow() {
 	// Add a TODO
 	id := uuid.MustParse("aa3cdd2f-17b9-4f43-9eb0-af56b42908c5")
 	todo := types.Todo{
@@ -56,21 +81,6 @@ func main() {
 	db.Delete(&existTodo)
 }
 
-// initData: Initialize data
-func initData() {
-	// Create
-	newTodo := types.Todo{
-		Id:     uuid.New(),
-		Title:  "Test",
-		IsDone: true,
-		// Model: gorm.Model{
-		// 	CreatedAt: time.Now(),
-		// 	UpdatedAt: time.Now(),
-		// },
-	}
-	db.Create(&newTodo)
-	// db.Create(&types.Todo{
-	// 	Id:     uuid.MustParse("aa3cdd2f-17b9-4f43-9eb0-af56b42908c5"),
-	// 	Title:  "Task A",
-	// 	IsDone: false})
+// handleMultipleRows: Insert, update and delete multiple rows sample
+func handleMultipleRows() {
 }
