@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"time"
 	"types"
 
 	"github.com/google/uuid"
@@ -16,9 +18,22 @@ func main() {
 		log.Fatal("Failed to connect database")
 	}
 
+	shit := types.Todo{
+		Id:     uuid.New(),
+		Title:  "Test",
+		IsDone: true,
+		Model: gorm.Model{
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+	}
+
+	fmt.Println(shit)
+
 	db.AutoMigrate(&types.Todo{})
 
 	// Create
+	// db.Create(&shit)
 	db.Create(&types.Todo{
 		Id:     uuid.MustParse("aa3cdd2f-17b9-4f43-9eb0-af56b42908c5"),
 		Title:  "Task A",

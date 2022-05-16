@@ -7,7 +7,12 @@ import (
 
 type Todo struct {
 	gorm.Model
-	Id     uuid.UUID `json:"id"`
-	Title  string    `json:"title"`
-	IsDone bool      `json:"isDone"`
+	Id     uuid.UUID `gorm:"primarykey;type:uuid;default:uuid_generate_v4()"`
+	Title  string
+	IsDone bool
+}
+
+// TableName: Specified table name for struct Todo
+func (Todo) TableName() string {
+	return "Todos"
 }
