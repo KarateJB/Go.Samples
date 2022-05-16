@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"time"
 	"types"
 
 	"github.com/google/uuid"
@@ -31,10 +30,10 @@ func initData(db *gorm.DB) {
 		Id:     uuid.New(),
 		Title:  "Test",
 		IsDone: true,
-		Model: gorm.Model{
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-		},
+		// Model: gorm.Model{
+		// 	CreatedAt: time.Now(),
+		// 	UpdatedAt: time.Now(),
+		// },
 	}
 	db.Create(&newTodo)
 	// db.Create(&types.Todo{
