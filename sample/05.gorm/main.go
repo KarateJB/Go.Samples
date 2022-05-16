@@ -9,13 +9,18 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 var db *gorm.DB
 
+const logLevel = logger.Silent // logger.Info
+
 func main() {
+	// Set database connection string
 	dsn := "host=localhost user=postgres password=1qaz2wsx dbname=postgres port=5432 sslmode=disable TimeZone=UTC"
-	openedDb, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+
+	openedDb, err := gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: logger.Default.LogMode(logLevel)})
 	if err != nil {
 		log.Fatal("Failed to connect database")
 	}
@@ -28,7 +33,7 @@ func main() {
 	initData()
 
 	// Single row handling
-	handleSingleRow()
+	// handleSingleRow()
 
 	// Multiple rows handling
 	handleMultipleRows()
@@ -83,4 +88,18 @@ func handleSingleRow() {
 
 // handleMultipleRows: Insert, update and delete multiple rows sample
 func handleMultipleRows() {
+
+	// tx := db.Session(&Session{Logger: dbLogger})
+	// Bulk insert
+	todos := []types.Todo{
+		{Id: uuid.MustParse("0f36f6bc-5a26-4bf6-9557-75e2c5c9f12c"), Title: "Task A", IsDone: false},
+		{Id: uuid.MustParse("6c3e7544-2d9d-46c0-a05a-d3c0390634b6"), Title: "Task B", IsDone: false},
+		{Id: uuid.MustParse("d9f13086-413f-4583-a08b-62e3d4c7102e"), Title: "Task C", IsDone: false},
+		{Id: uuid.MustParse("1bc6acb8-596e-4fcb-8514-23f42277d4a6"), Title: "Task D", IsDone: false},
+		{Id: uuid.MustParse("5a5eddea-f904-4257-9532-c96522a2c169"), Title: "Task E", IsDone: false},
+	}
+	// db.Create(&todos)
+	db.CreateInBatches(&todos, 3)
+
+	//
 }
