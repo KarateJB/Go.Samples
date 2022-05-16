@@ -23,9 +23,28 @@ type Todo struct {
 	// gorm.Model // We can embeded the gorm.Model that has CreatedAt, UpdatedAt and DeletedAt fields
 }
 
+type TodoDetail struct {
+	Id          uuid.UUID `gorm:"primaryKey;type:uuid;column:Id"`
+	Priority    int       `gorm:"column:Priority;"`
+	Description string    `gorm:"column:Description;size:500"`
+}
+
+type Priority struct {
+	Id   int    `gorm:"primaryKey;autoIncrement:true;"`
+	Name string `gorm:"unique;column:Name;size:20;not null"`
+}
+
 // TableName: Specified table name for struct Todo
 func (Todo) TableName() string {
 	return "Todos"
+}
+
+func (TodoDetail) TableName() string {
+	return "TodoDetails"
+}
+
+func (Priority) TableName() string {
+	return "Priorities"
 }
 
 func (m *Todo) Print() {
