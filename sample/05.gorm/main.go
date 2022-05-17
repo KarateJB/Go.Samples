@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 	"types"
 
@@ -49,21 +50,13 @@ func initData() {
 		{Id: 2, Name: "Medium"},
 		{Id: 3, Name: "Low"},
 	})
-	// New TODO
-	newTodo := types.Todo{
-		Id:     uuid.New(),
-		Title:  "Test",
-		IsDone: true,
-		TodoExt: types.TodoExt{
-			PriorityId:  1,
-			Description: "Testing",
-		},
-		// Model: gorm.Model{
-		// 	CreatedAt: time.Now(),
-		// 	UpdatedAt: time.Now(),
-		// },
-	}
-	db.Create(&newTodo)
+
+	// Test data
+	db.Create(&types.User{
+		Id:    "JB_" + strconv.FormatInt(time.Now().Unix(), 10),
+		Name:  "JB Lin",
+		Todos: *types.Todo{}.CreateRandom(3),
+	})
 	// db.Create(&types.Todo{...})
 }
 

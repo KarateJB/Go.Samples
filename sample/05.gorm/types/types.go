@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/google/uuid"
@@ -65,7 +66,31 @@ func (Priority) TableName() string {
 
 //------------------------------------------------
 
+// Print: Output TODO as JSON string
 func (m *Todo) Print() {
 	om, _ := json.MarshalIndent(m, "", "\t")
 	fmt.Printf("%s\n", string(om))
+}
+
+// CreateRand: Create a random TODO
+func (t Todo) CreateRandom(n int) *[]Todo {
+	rand.Seed(time.Now().UnixNano())
+	var todos []Todo
+	for i := 0; i < n; i++ {
+		todos = append(todos, Todo{
+			Id:     uuid.New(),
+			Title:  "Random task",
+			IsDone: false,
+			TodoExt: TodoExt{
+				PriorityId:  rand.Intn(3) + 1, //Random [1,3]
+				Description: "Only for testing",
+			},
+			// Model: gorm.Model{
+			// 	CreatedAt: time.Now(),
+			// 	UpdatedAt: time.Now(),
+			// },
+		})
+	}
+
+	return &todos
 }
