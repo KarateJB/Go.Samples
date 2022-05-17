@@ -22,13 +22,13 @@ type Todo struct {
 	IsDone bool      `gorm:"column:IsDone;not null;default:false"`
 	// TodoExtId uuid.UUID `gorm:"column:TodoExtId;default:NULL"`
 	TrackDateTimes
-	TodoExt TodoExt // HasOne relation on TodoExt
+	TodoExt TodoExt `gorm:"foreignkey:Id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"` // HasOne relation on TodoExt
 	// gorm.Model // We can embeded the gorm.Model that has CreatedAt, UpdatedAt and DeletedAt fields
 }
 
 // TodoExt: Todo's extension table
 type TodoExt struct {
-	TodoId      uuid.UUID `gorm:"column:Id;primaryKey"` // HasOne relation on Todo
+	Id          uuid.UUID `gorm:"column:Id;primaryKey"` // HasOne relation on Todo, if this field name is "UserId" then we can ignore setting "foreignKey:Id" on Todo struct's field "TodoExt"
 	Description string    `gorm:"column:Description;size:500"`
 	PriorityId  int       `gorm:"column:PriorityId"`
 	Priority    Priority  `gorm:"foreignKey:PriorityId;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"` // The tag: "foreignKey" is optional here, it uses the type name plus its primary field name in default.
