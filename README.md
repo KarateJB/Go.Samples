@@ -4,7 +4,8 @@ sample<br />
 ├── 01.HelloWorld<br />
 ├── 02.CreateModule<br />
 ├── 03.net-http<br />
-└── 04.gin
+├── 04.gin<br />
+└── 04.gorm
 
 
 # References
@@ -13,3 +14,4 @@ sample<br />
 - [Package fmt](https://golang.org/pkg/fmt/)
 - [golang fmt格式“占位符”](https://studygolang.com/articles/2644)
 - [Go into Web](https://ithelp.ithome.com.tw/users/20120647/ironman/3110)
+- [GORM Guides](https://gorm.io/docs/)
