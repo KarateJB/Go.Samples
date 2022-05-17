@@ -29,8 +29,7 @@ func main() {
 	db = openedDb
 
 	// Migrate
-	// db.AutoMigrate(&types.Priority{}, &types.TodoExt{}, &types.Todo{})
-	db.AutoMigrate(&types.Priority{}, &types.Todo{}, &types.TodoExt{})
+	db.AutoMigrate(&types.Priority{}, &types.User{}, &types.Todo{}, &types.TodoExt{})
 
 	// Initialize data
 	initData()
