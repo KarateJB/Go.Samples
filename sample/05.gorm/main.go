@@ -29,21 +29,27 @@ func main() {
 	db = openedDb
 
 	// Migrate
-	db.AutoMigrate(&types.Todo{})
+	db.AutoMigrate(&types.Todo{}, types.Priority{})
 
 	// Initialize data
 	initData()
 
 	// Single row handling
-	handleSingleRow()
+	// handleSingleRow()
 
 	// Multiple rows handling
-	handleMultipleRows()
+	// handleMultipleRows()
 }
 
 // initData: Initialize data
 func initData() {
-	// Create
+	// Init Priorities
+	db.Create(&[]types.Priority{
+		{Id: 1, Name: "High"},
+		{Id: 2, Name: "Medium"},
+		{Id: 3, Name: "Low"},
+	})
+	// New TODO
 	newTodo := types.Todo{
 		Id:     uuid.New(),
 		Title:  "Test",
