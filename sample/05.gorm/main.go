@@ -29,7 +29,8 @@ func main() {
 	db = openedDb
 
 	// Migrate
-	db.AutoMigrate(&types.Priority{}, &types.TodoExt{}, &types.Todo{})
+	// db.AutoMigrate(&types.Priority{}, &types.TodoExt{}, &types.Todo{})
+	db.AutoMigrate(&types.Priority{}, &types.Todo{}, &types.TodoExt{})
 
 	// Initialize data
 	initData()
@@ -54,6 +55,10 @@ func initData() {
 		Id:     uuid.New(),
 		Title:  "Test",
 		IsDone: true,
+		TodoExt: types.TodoExt{
+			PriorityId:  1,
+			Description: "Testing",
+		},
 		// Model: gorm.Model{
 		// 	CreatedAt: time.Now(),
 		// 	UpdatedAt: time.Now(),

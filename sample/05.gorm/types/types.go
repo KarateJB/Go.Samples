@@ -17,18 +17,18 @@ type TrackDateTimes struct {
 
 // Todo:
 type Todo struct {
-	Id        uuid.UUID `gorm:"primarykey;type:uuid;column:Id;default:uuid_generate_v4()"`
-	Title     string    `gorm:"column:Title;not null"`
-	IsDone    bool      `gorm:"column:IsDone;not null;default:false"`
-	TodoExtId uuid.UUID `gorm:"column:TodoExtId;default:NULL"`
+	Id     uuid.UUID `gorm:"column:Id;type:uuid;primarykey;default:uuid_generate_v4()"`
+	Title  string    `gorm:"column:Title;not null"`
+	IsDone bool      `gorm:"column:IsDone;not null;default:false"`
+	// TodoExtId uuid.UUID `gorm:"column:TodoExtId;default:NULL"`
 	TrackDateTimes
-	TodoExt TodoExt `gorm:"foreignKey:TodoExtId;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	TodoExt TodoExt // HasOne relation on TodoExt
 	// gorm.Model // We can embeded the gorm.Model that has CreatedAt, UpdatedAt and DeletedAt fields
 }
 
 // TodoExt: Todo's extension table
 type TodoExt struct {
-	Id          uuid.UUID `gorm:"primaryKey;type:uuid;column:Id"`
+	TodoId      uuid.UUID `gorm:"column:Id;primaryKey"` // HasOne relation on Todo
 	Description string    `gorm:"column:Description;size:500"`
 	PriorityId  int       `gorm:"column:PriorityId"`
 	Priority    Priority  `gorm:"foreignKey:PriorityId;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"` // The tag: "foreignKey" is optional here, it uses the type name plus its primary field name in default.
@@ -36,8 +36,8 @@ type TodoExt struct {
 
 // Priority: Mapping table
 type Priority struct {
-	Id   int    `gorm:"primaryKey;autoIncrement:true;"`
-	Name string `gorm:"unique;column:Name;size:20;not null"`
+	Id   int    `gorm:"column:Id;primaryKey;autoIncrement:true;"`
+	Name string `gorm:"column:Name;unique;size:20;not null"`
 }
 
 // TableName: Specified table name for struct Todo
