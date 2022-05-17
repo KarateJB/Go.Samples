@@ -35,11 +35,9 @@ func main() {
 	// Initialize data
 	initData()
 
-	// Single row handling
-	// handleSingleRow()
-
-	// Multiple rows handling
-	// handleMultipleRows()
+	// Demo on CRUD
+	// handleSingleRow() // Single row handling
+	// handleMultipleRows()	// Multiple rows handling
 }
 
 // initData: Initialize data
@@ -57,7 +55,10 @@ func initData() {
 		Name:  "JB Lin",
 		Todos: *types.Todo{}.CreateRandom(3),
 	})
-	// db.Create(&types.Todo{...})
+	db.Create(&[]types.Tag{
+		{Id: uuid.New(), Name: "DevOps"},
+		{Id: uuid.New(), Name: "Programming"},
+	})
 }
 
 // handleSingleRow: Insert, update and delete single row samples

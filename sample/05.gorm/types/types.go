@@ -10,6 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// TrackDateTimes: A base struct that has create/update/delete time
 type TrackDateTimes struct {
 	CreateOn time.Time    `gorm:"column:CreateOn;not null;default:now();comment:Created datetime(UTC)"`
 	UpdateOn sql.NullTime `gorm:"column:UpdateOn;default:NULL;comment:Updated datetime(UTC)"`
@@ -116,5 +117,6 @@ func (t Todo) CreateRandom(n int) *[]Todo {
 		})
 	}
 
+	// db.Create(&types.Todo{...})
 	return &todos
 }
