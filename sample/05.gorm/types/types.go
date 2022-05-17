@@ -31,6 +31,7 @@ type Todo struct {
 	TrackDateTimes           // Or use gorm.Model instead
 	TodoExt        TodoExt   `gorm:"foreignkey:Id;references:Id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"` // HasOne relation on "TodoExt". The "TodoExt" will has a foreign key "Id" which has reference on "Todo"."Id"
 	UserId         string    `gorm:"column:UserId;default:NULL"`                                                // If this field name is "UserId", we can ignore setting "foreignKey:Id" on "User" struct's field "Todos"
+	Tags           []*Tag    `gorm:"many2many:TodoTags;foreignKey:Id;"`                                         // Many to many relation
 }
 
 // TodoExt: Todo's extension table
@@ -41,10 +42,25 @@ type TodoExt struct {
 	Priority    Priority  `gorm:"foreignKey:PriorityId;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"` // The tag: "foreignKey" is optional here, it uses the type name plus its primary field name in default.
 }
 
+// Tag: A Todo can have many Tags, and a Tag can have many Todos
+type Tag struct {
+	Id    uuid.UUID `gorm:"column:Id;type:uuid;primaryKey;default:uuid_generate_v4()"`
+	Name  string    `gorm:"column:Name;size:200;not null"`
+	Todos []*Todo   `gorm:"many2many:TodoTags;foreignKey:Id;"` // Many to many relation
+}
+
 // Priority: Mapping table
 type Priority struct {
 	Id   int    `gorm:"column:Id;primaryKey;autoIncrement:true;"`
 	Name string `gorm:"column:Name;unique;size:20;not null"`
+}
+
+// UserTags: The relation table of Todo and Tag (many-to-many relation)
+type TodoTag struct {
+	TodoId uuid.UUID `gorm:"column:TodoId;primaryKey"`
+	TagId  uuid.UUID `gorm:"column:TagId;primaryKey"`
+	Todo   Todo      `gorm:"foreignKey:TodoId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Tag    Tag       `gorm:"foreignKey:TagId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 /* TableName: Specified table name for struct */
@@ -62,6 +78,14 @@ func (TodoExt) TableName() string {
 
 func (Priority) TableName() string {
 	return "Priorities"
+}
+
+func (Tag) TableName() string {
+	return "Tags"
+}
+
+func (TodoTag) TableName() string {
+	return "TodoTags"
 }
 
 //------------------------------------------------

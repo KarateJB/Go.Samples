@@ -30,7 +30,7 @@ func main() {
 	db = openedDb
 
 	// Migrate
-	db.AutoMigrate(&types.Priority{}, &types.User{}, &types.Todo{}, &types.TodoExt{})
+	db.AutoMigrate(&types.Priority{}, &types.User{}, &types.Todo{}, &types.TodoExt{}, &types.Tag{}, &types.TodoTag{})
 
 	// Initialize data
 	initData()
