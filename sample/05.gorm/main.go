@@ -16,7 +16,7 @@ import (
 
 var db *gorm.DB
 
-const logLevel = logger.Silent // logger.Silent to disable outputing SQL tracking
+const logLevel = logger.Info // logger.Silent to disable outputing SQL tracking
 
 func main() {
 	// Set database connection string
@@ -29,7 +29,7 @@ func main() {
 	db = openedDb
 
 	// Migrate
-	db.AutoMigrate(&types.Todo{}, types.Priority{})
+	db.AutoMigrate(&types.Priority{}, &types.TodoExt{}, &types.Todo{})
 
 	// Initialize data
 	initData()
