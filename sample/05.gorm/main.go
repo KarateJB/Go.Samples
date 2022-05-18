@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"time"
 	"types"
@@ -36,7 +37,7 @@ func main() {
 	handleSingleRow()
 
 	// Multiple rows handling
-	handleMultipleRows()
+	// handleMultipleRows()
 }
 
 // initData: Initialize data
@@ -65,11 +66,15 @@ func handleSingleRow() {
 		IsDone: false,
 	}
 	db.FirstOrCreate(&todo) // Read the record that matchs the value of "id", or insert a new row.
+	fmt.Print("Created TODO as following...")
 	todo.Print()
 
 	// Read a TODO
 	var existTodo types.Todo
-	db.First(&existTodo, id)
+	db.First(&existTodo, id) // Get first row by primary key
+	// db.First(&existTodo, `"Id" = ?`, id) // Get first row by where condition
+	// db.Model(types.Todo{}).Where(`"Id" = ?`, id).First(&existTodo) // Get first row by where condition
+	fmt.Print("Read TODO as following...")
 	existTodo.Print()
 
 	// Update a TODO
@@ -80,6 +85,7 @@ func handleSingleRow() {
 			UpdateOn: sql.NullTime{Time: time.Now(), Valid: true}, // Set Valid = true is optional, it will be true once we read the row from DB.
 		},
 	})
+	fmt.Print("Updated TODO as following...")
 	existTodo.Print()
 
 	// Delete a TODO
