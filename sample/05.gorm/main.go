@@ -115,7 +115,7 @@ func handleMultipleRows() {
 	// db.CreateInBatches(&todos, 3)
 
 	// Batch update
-	db.Model(types.Todo{}).Where(`"IsDone" = ?`, false).Updates(types.Todo{
+	db.Model(&types.Todo{}).Where(`"IsDone" = ?`, false).Updates(types.Todo{
 		IsDone: true,
 		TrackDateTimes: types.TrackDateTimes{
 			UpdateOn: sql.NullTime{Time: time.Now(), Valid: true},
