@@ -71,17 +71,11 @@ func handleSingleRow() {
 		IsDone: false,
 	}
 	db.FirstOrCreate(&todo) // Read the record that matchs the value of "id", or insert a new row.
-<<<<<<< HEAD
 	fmt.Print("Created TODO as following...")
 	todo.Print()
-=======
-	// todo.Print()
-	Print(todo)
->>>>>>> 421ba59 (Create more DAO)
 
 	/* READ */
 	var existTodo types.Todo
-<<<<<<< HEAD
 	db.First(&existTodo, id) // Get first row by primary key
 	// db.First(&existTodo, `"Id" = ?`, id) // Get first row by where condition
 	// db.Model(&types.Todo{}).Where(`"Id" = ?`, id).First(&existTodo) // Get first row by where condition
@@ -103,22 +97,6 @@ func handleSingleRow() {
 	// })
 	fmt.Print("Updated TODO as following...")
 	existTodo.Print()
-=======
-	db.First(&existTodo, id)
-	// existTodo.Print()
-	Print(existTodo)
-
-	// Update a TODO
-	db.Model(&existTodo).Update("Title", "Task ???")
-	db.Model(&existTodo).Updates(types.Todo{
-		IsDone: true,
-		TrackDateTimes: types.TrackDateTimes{
-			UpdateOn: sql.NullTime{Time: time.Now(), Valid: true}, // Set Valid = true is optional, it will be true once we read the row from DB.
-		},
-	})
-	// existTodo.Print()
-	Print(existTodo)
->>>>>>> 421ba59 (Create more DAO)
 
 	// Update a TODO (without read it first)
 	// db.Model(&types.Todo{}).Where(`"Id" = ?`, id).Update("Title", "Task XXX")
