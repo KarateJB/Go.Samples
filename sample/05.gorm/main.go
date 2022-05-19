@@ -2,8 +2,10 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 	"types"
 
@@ -28,32 +30,35 @@ func main() {
 	db = openedDb
 
 	// Migrate
-	db.AutoMigrate(&types.Todo{})
+	db.AutoMigrate(&types.Priority{}, &types.User{}, &types.Todo{}, &types.TodoExt{}, &types.Tag{}, &types.TodoTag{})
 
 	// Initialize data
 	initData()
 
-	// Single row handling
-	handleSingleRow()
-
-	// Multiple rows handling
-	handleMultipleRows()
+	// Demo on CRUD
+	// handleSingleRow() // Single row handling
+	// handleMultipleRows()	// Multiple rows handling
 }
 
 // initData: Initialize data
 func initData() {
-	// Create
-	newTodo := types.Todo{
-		Id:     uuid.New(),
-		Title:  "Test",
-		IsDone: true,
-		// Model: gorm.Model{
-		// 	CreatedAt: time.Now(),
-		// 	UpdatedAt: time.Now(),
-		// },
-	}
-	db.Create(&newTodo)
-	// db.Create(&types.Todo{...})
+	// Init Priorities
+	db.Create(&[]types.Priority{
+		{Id: 1, Name: "High"},
+		{Id: 2, Name: "Medium"},
+		{Id: 3, Name: "Low"},
+	})
+
+	// Test data
+	db.Create(&types.User{
+		Id:    "JB_" + strconv.FormatInt(time.Now().Unix(), 10),
+		Name:  "JB Lin",
+		Todos: *types.Todo{}.CreateRandom(3),
+	})
+	db.Create(&[]types.Tag{
+		{Id: uuid.New(), Name: "DevOps"},
+		{Id: uuid.New(), Name: "Programming"},
+	})
 }
 
 // handleSingleRow: Insert, update and delete single row samples
@@ -125,4 +130,9 @@ func handleMultipleRows() {
 	// Batch delete
 	db.Where(`"Title" LIKE ?`, "Task%").Delete(&types.Todo{})
 	// db.Delete(&types.Todo{}, `"Title" LIKE ?`, "Task%")
+}
+
+func Print[T any](m T) {
+	om, _ := json.MarshalIndent(m, "", "\t")
+	fmt.Printf("%s\n", string(om))
 }
