@@ -37,7 +37,7 @@ func main() {
 	handleSingleRow()
 
 	// Multiple rows handling
-	// handleMultipleRows()
+	handleMultipleRows()
 }
 
 // initData: Initialize data
@@ -58,37 +58,45 @@ func initData() {
 
 // handleSingleRow: Insert, update and delete single row samples
 func handleSingleRow() {
-	// Add a TODO
+	/* CREATE */
 	id := uuid.MustParse("aa3cdd2f-17b9-4f43-9eb0-af56b42908c5")
 	todo := types.Todo{
 		Id:     id,
-		Title:  "Task A",
+		Title:  "Test task",
 		IsDone: false,
 	}
 	db.FirstOrCreate(&todo) // Read the record that matchs the value of "id", or insert a new row.
 	fmt.Print("Created TODO as following...")
 	todo.Print()
 
-	// Read a TODO
+	/* READ */
 	var existTodo types.Todo
 	db.First(&existTodo, id) // Get first row by primary key
 	// db.First(&existTodo, `"Id" = ?`, id) // Get first row by where condition
-	// db.Model(types.Todo{}).Where(`"Id" = ?`, id).First(&existTodo) // Get first row by where condition
+	// db.Model(&types.Todo{}).Where(`"Id" = ?`, id).First(&existTodo) // Get first row by where condition
+	// db.Model(&types.Todo{}).Where(`"Id" = ?`, id).Where(`"Title" = ?`, "Test task").First(&existTodo) // AND conditions
+	// db.Model(&types.Todo{}).Where(types.Todo{Id: id, Title: "Test task"}).First(&existTodo) // AND conditions
+	// db.Model(&types.Todo{}).Where(`"Id" = ?`, id).Or(`"Title" = ?`, "Test task").First(&existTodo) // OR conditions
 	fmt.Print("Read TODO as following...")
 	existTodo.Print()
 
-	// Update a TODO
-	db.Model(&existTodo).Update("Title", "Task ???")
-	db.Model(&existTodo).Updates(types.Todo{
-		IsDone: true,
-		TrackDateTimes: types.TrackDateTimes{
-			UpdateOn: sql.NullTime{Time: time.Now(), Valid: true}, // Set Valid = true is optional, it will be true once we read the row from DB.
-		},
-	})
+	/* UPDATE */
+	// Update a TODO (After read it)
+	db.First(&existTodo, id).Update("Title", "Task XXX")
+	// db.Model(&existTodo).Update("Title", "Task XXX")
+	// db.Model(&existTodo).Updates(types.Todo{
+	// 	IsDone: true,
+	// 	TrackDateTimes: types.TrackDateTimes{
+	// 		UpdateOn: sql.NullTime{Time: time.Now(), Valid: true}, // Set Valid = true is optional, it will be true once we read the row from DB.
+	// 	},
+	// })
 	fmt.Print("Updated TODO as following...")
 	existTodo.Print()
 
-	// Delete a TODO
+	// Update a TODO (without read it first)
+	// db.Model(&types.Todo{}).Where(`"Id" = ?`, id).Update("Title", "Task XXX")
+
+	/* DELETE */
 	db.Delete(&existTodo)
 }
 
