@@ -17,9 +17,9 @@ type TrackDateTimes struct {
 	DeleteOn sql.NullTime `gorm:"column:DeleteOn;default:NULL;comment:Deleted datetime(UTC)"`
 }
 
-// Owner: A owner has one or many Todo
+// User: A user has no or many TODOs
 type User struct {
-	Id    string `gorm:"column:UserId;primaryKey;size:100"`
+	Id    string `gorm:"column:Id;primaryKey;size:100"`
 	Name  string `gorm:"column:Name;size:200;not null"`
 	Todos []Todo `gorm:"foreignKey:UserId;references:Id;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"` // HasMany relation on Todo. "Todo" will has a foreign key "UserId" which has reference on "User"."Id"
 }
