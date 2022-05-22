@@ -14,7 +14,7 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-var myTodoList types.TodoPageData
+var myTodoList []types.Todo
 
 // @Title TODO API
 // @Version 1.0
@@ -25,13 +25,10 @@ var myTodoList types.TodoPageData
 // @Contact.Url https://karatejb.blogspot.com/
 // @Contact.Email xxx@demo.com
 func main() {
-	myTodoList = types.TodoPageData{
-		PageTitle: "My TODO list",
-		Todos: []types.Todo{
-			{Id: uuid.MustParse("aa3cdd2f-17b9-4f43-9eb0-af56b42908c5"), Title: "Task A", IsDone: false},
-			{Id: uuid.MustParse("bbf5d05c-c442-4869-8326-ab5cfa832f6a"), Title: "Task B", IsDone: true},
-			{Id: uuid.MustParse("cca89c32-a0d9-43c9-84e2-ae1224c5d755"), Title: "Task C", IsDone: true},
-		},
+	myTodoList = []types.Todo{
+		{Id: uuid.MustParse("aa3cdd2f-17b9-4f43-9eb0-af56b42908c5"), Title: "Task A", IsDone: false},
+		{Id: uuid.MustParse("bbf5d05c-c442-4869-8326-ab5cfa832f6a"), Title: "Task B", IsDone: true},
+		{Id: uuid.MustParse("cca89c32-a0d9-43c9-84e2-ae1224c5d755"), Title: "Task C", IsDone: true},
 	}
 
 	// Init Gin router
@@ -63,7 +60,7 @@ func main() {
 // @Router /api/todo [get]
 // @Accept json
 // @Produce json
-// @Success 200 {object} types.TodoPageData "OK"
+// @Success 200 {array} types.Todo "OK"
 // getTodoList: The handler to response the TODO list
 func getTodoList(c *gin.Context) {
 
@@ -84,7 +81,7 @@ func getTodo(c *gin.Context) {
 	id := c.Param("id") // Get the value from api/todo/:id
 
 	// Search the matched TODO from the list by Id.
-	for _, todo := range myTodoList.Todos {
+	for _, todo := range myTodoList {
 		if todo.Id.String() == id {
 			c.IndentedJSON(http.StatusOK, todo)
 			return
@@ -102,18 +99,17 @@ func getTodo(c *gin.Context) {
 // @Param isDone query boolean false "Matched value for TODO's IsDone." default(false)
 // @Accept json
 // @Produce json
-// @Success 200 {object} types.TodoPageData "OK"
+// @Success 200 {array} types.Todo "OK"
 // searchTodo: The handler for searching the TODOs by title and isDone
 func searchTodo(c *gin.Context) {
 	queryValIsDone, _ := strconv.ParseBool(c.DefaultQuery("isDone", "false"))
 	queryValTitle := c.Query("title")
 
-	matchedTodoList := new(types.TodoPageData)
-	matchedTodoList.PageTitle = myTodoList.PageTitle
+	var matchedTodoList []types.Todo
 
-	for _, todo := range myTodoList.Todos {
+	for _, todo := range myTodoList {
 		if todo.IsDone == queryValIsDone && strings.Contains(todo.Title, queryValTitle) {
-			matchedTodoList.Todos = append(matchedTodoList.Todos, todo)
+			matchedTodoList = append(matchedTodoList, todo)
 		}
 	}
 
@@ -124,7 +120,7 @@ func searchTodo(c *gin.Context) {
 // @Title Create a new TODO
 // @Description The handler to add a new TODO
 // @Router /api/todo [post]
-// @Param todo body types.TodoPageData true "The new TODO to be created."
+// @Param todo body types.Todo true "The new TODO to be created."
 // @Accept json
 // @Produce json
 // @Success 201 {object} types.Todo
@@ -137,7 +133,7 @@ func postTodo(c *gin.Context) {
 		c.Writer.WriteHeader(http.StatusBadRequest)
 	}
 	newTodo.Id = uuid.New() // Set Id
-	myTodoList.Todos = append(myTodoList.Todos, newTodo)
+	myTodoList = append(myTodoList, newTodo)
 	c.IndentedJSON(http.StatusCreated, newTodo)
 }
 
@@ -156,9 +152,9 @@ func putTodo(c *gin.Context) {
 		c.Writer.WriteHeader(http.StatusBadRequest)
 	}
 
-	for index, todo := range myTodoList.Todos {
+	for index, todo := range myTodoList {
 		if todo.Id == editTodo.Id {
-			myTodoList.Todos[index].Title, myTodoList.Todos[index].IsDone = editTodo.Title, editTodo.IsDone
+			myTodoList[index].Title, myTodoList[index].IsDone = editTodo.Title, editTodo.IsDone
 
 			// range copies the values from the slice that iterated over, so below code wont work.
 			// todo.Title = editTodo.Title
@@ -188,11 +184,11 @@ func deleteTodo(c *gin.Context) {
 	}
 
 	// We can find the index if the request contains the full values of the item.
-	removeIndex := slices.Index(myTodoList.Todos, deleteTodo)
+	removeIndex := slices.Index(myTodoList, deleteTodo)
 
 	// But if we only has ID from the request, then get the index by comparing the Id.
 	if removeIndex < 0 {
-		for index, todo := range myTodoList.Todos {
+		for index, todo := range myTodoList {
 			if todo.Id == deleteTodo.Id {
 				removeIndex = index
 				break
@@ -202,7 +198,7 @@ func deleteTodo(c *gin.Context) {
 
 	// Try removing the TODO from list
 	if removeIndex >= 0 {
-		myTodoList.Todos = slices.Delete(myTodoList.Todos, removeIndex, removeIndex+1)
+		myTodoList = slices.Delete(myTodoList, removeIndex, removeIndex+1)
 		// fmt.Println(myTodoList)
 	} else {
 		c.Writer.WriteHeader(http.StatusUnprocessableEntity)

@@ -14,12 +14,18 @@ type TrackDateTimes struct {
 }
 
 type User struct {
-	Id    string `json:"id"`
-	Name  string `json:"name"`
-	Todos []Todo `json:"todos"`
+	Id     string  `json:"id"`
+	Name   string  `json:"name"`
+	TodoDs []TodoD `json:"todos"`
 }
 
 type Todo struct {
+	Id     uuid.UUID `json:"id"`
+	Title  string    `json:"title"`
+	IsDone bool      `json:"isDone"`
+}
+
+type TodoD struct {
 	Id             uuid.UUID `json:"id"`
 	Title          string    `json:"title"`
 	IsDone         bool      `json:"isDone"`
@@ -43,10 +49,4 @@ type Tag struct {
 type Priority struct {
 	Id   int    `json:"id"`
 	Name string `json:"name"`
-}
-
-// TODO: Remove this struct
-type TodoPageData struct {
-	PageTitle string `json:"pageTitle"`
-	Todos     []Todo `json:"todos"`
 }
