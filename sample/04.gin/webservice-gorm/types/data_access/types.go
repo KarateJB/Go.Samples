@@ -1,4 +1,4 @@
-package datypes
+package dbtypes
 
 import (
 	"database/sql"
@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 // TrackDateTimes: A base struct that has create/update/delete time
@@ -15,6 +16,7 @@ type TrackDateTimes struct {
 	CreateOn time.Time    `gorm:"column:CreateOn;not null;default:now();comment:Created datetime(UTC)"`
 	UpdateOn sql.NullTime `gorm:"column:UpdateOn;default:NULL;comment:Updated datetime(UTC)"`
 	DeleteOn sql.NullTime `gorm:"column:DeleteOn;default:NULL;comment:Deleted datetime(UTC)"`
+	gorm.Model
 }
 
 // User: A user has no or many TODOs

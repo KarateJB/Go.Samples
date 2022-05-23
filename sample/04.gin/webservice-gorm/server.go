@@ -1,6 +1,7 @@
 package main
 
 import (
+	"dbaccess"
 	"example/webservice/docs"
 	"net/http"
 	"strconv"
@@ -12,6 +13,7 @@ import (
 	swagger "github.com/swaggo/gin-swagger"
 	swaggerfiles "github.com/swaggo/gin-swagger/swaggerFiles"
 	"golang.org/x/exp/slices"
+	"gorm.io/gorm/logger"
 )
 
 var myTodoList []types.Todo
@@ -52,6 +54,9 @@ func main() {
 	// url := swagger.URL("https://petstore.swagger.io/v2/swagger.json") // The url pointing to API definition
 	// router.GET("/swagger/*any", swagger.WrapHandler(swaggerfiles.Handler, url))
 
+	// DB connect configuration
+	dsn := "host=localhost user=postgres password=1qaz2wsx dbname=postgres port=5432 sslmode=disable TimeZone=UTC"
+	_ = dbaccess.New(dsn, logger.Info)
 	router.Run("localhost:8001")
 }
 
