@@ -1,12 +1,12 @@
 package main
 
 import (
-	"dbaccess"
 	"example/webservice/docs"
+	dbaccess "example/webservice/services"
+	types "example/webservice/types/api"
 	"net/http"
 	"strconv"
 	"strings"
-	"types"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -56,7 +56,10 @@ func main() {
 
 	// DB connect configuration
 	dsn := "host=localhost user=postgres password=1qaz2wsx dbname=postgres port=5432 sslmode=disable TimeZone=UTC"
-	_ = dbaccess.New(dsn, logger.Info)
+	dbService := dbaccess.New(dsn, logger.Info)
+	dbService.Migrate()
+	dbService.InitData()
+
 	router.Run("localhost:8001")
 }
 
