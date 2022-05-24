@@ -14,9 +14,9 @@ type TrackDateTimes struct {
 }
 
 type User struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
-	// TodoDs []TodoD `json:"todos"`
+	Id     string  `json:"id"`
+	Name   string  `json:"name"`
+	TodoDs []TodoD `json:"todos,omitempty"`
 }
 
 type Todo struct {

@@ -39,7 +39,9 @@ func main() {
 	router := gin.Default()
 
 	// User
+	router.GET("api/user/:id", getUser)
 	router.POST("api/user", postUser)
+	router.DELETE("api/user", deleteUser)
 
 	// Todo
 	router.GET("api/todo", getTodoList)
@@ -71,6 +73,27 @@ func main() {
 	userService = userservice.New(dbService.DB)
 
 	router.Run("localhost:8001")
+}
+
+// @Title Get a User by its Id
+// @Description The handler for getting the User by Id
+// @Router /api/todo/{id} [get]
+// @Param id path string true "A User's Id."
+// @Accept json
+// @Produce json
+// @Success 200 {object} types.Todo "OK"
+// @Success 204 "No Content"
+// getTodo: The handler for getting the User by Id
+func getUser(c *gin.Context) {
+	id := c.Param("id") // Get the value from api/user/:id
+	user := userService.Get(id)
+
+	if user == nil {
+		// If not found, response 204
+		c.Writer.WriteHeader(http.StatusNoContent)
+	} else {
+		c.IndentedJSON(http.StatusOK, user)
+	}
 }
 
 // @Title Get TODO list
@@ -203,6 +226,27 @@ func putTodo(c *gin.Context) {
 	}
 
 	c.Writer.WriteHeader(http.StatusBadRequest)
+}
+
+// @Title Delete a User
+// @Description The handler to delete an exist User from User list
+// @Router /api/user [delete]
+// @Param todo body types.Todo true "The User to be deleted."
+// @Accept json
+// @Produce json
+// @Success 200 "OK"
+// @Failure 400 "Bad Request"
+// @Failure 422 "Unprocessable Entity"
+// deleteTodo: The handler to delete an exist User from User list
+func deleteUser(c *gin.Context) {
+	var deleteUser types.User
+	if err := c.BindJSON(&deleteUser); err != nil {
+		c.Writer.WriteHeader(http.StatusBadRequest)
+	}
+
+	if count := userService.Delete(&deleteUser); count == 0 {
+		c.Writer.WriteHeader(http.StatusBadRequest)
+	}
 }
 
 // @Title Delete a TODO

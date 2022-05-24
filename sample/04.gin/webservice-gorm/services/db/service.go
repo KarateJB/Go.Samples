@@ -1,7 +1,7 @@
 package dbservice
 
 import (
-	dbtypes "example/webservice/types/data_access"
+	dbtypes "example/webservice/types/db"
 	"log"
 	"strconv"
 	"time"

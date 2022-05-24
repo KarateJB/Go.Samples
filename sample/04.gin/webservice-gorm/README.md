@@ -7,6 +7,16 @@ $ swag init  --parseDependency --parseInternal -g server.go
 
 ## curl samples
 
+```s
+
+curl -X POST "http://localhost:8001/api/user" --include --header "Content-Type: application/json" --data '{"Id": "JB", "Name": "JB Lin"}'
+
+curl http://localhost:8001/api/user/JB
+
+curl -X DELETE "http://localhost:8001/api/user" --include --header "Content-Type: application/json" --data '{"id": "JB"}'
+```
+
+
 ### GET
 
 `To get all TODOs`
