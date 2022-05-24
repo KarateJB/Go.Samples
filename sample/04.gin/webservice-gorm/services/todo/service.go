@@ -43,25 +43,36 @@ func (m *TodoAccess) Create(todo *types.Todo) *dbtypes.Todo {
 	automapper.MapLoose(todo, &entity)
 	m.DB.Create(&entity)
 	m.DB.Model(&entity).Association("Tags").Append(entity.Tags)
+
+	// Optional: if we use the custom many-to-many relation table "TodoTags"
+	tagIds := Map(todo.Tags, func(tag types.Tag) uuid.UUID {
+		return tag.Id
+	})
+	todoTags := Map(tagIds, func(tagId uuid.UUID) dbtypes.TodoTag {
+		return dbtypes.TodoTag{TodoId: entity.Id, TagId: tagId}
+	})
+
+	m.DB.Create(&todoTags)
 	return &entity
 }
 
 // Update: update a todo
 func (m *TodoAccess) Update(todo *types.Todo) int64 {
+	var entity dbtypes.Todo
 	var updatedCount int64
 
 	// Update TODO
-	m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, todo.Id).Updates(dbtypes.Todo{
-		Title:  todo.Title,
-		IsDone: todo.IsDone,
-		TodoExt: dbtypes.TodoExt{
-			Description: todo.TodoExt.Description,
-			PriorityId:  todo.TodoExt.PriorityId,
-		},
-		UserId: todo.UserId,
-	}).Count(&updatedCount)
+	automapper.MapLoose(todo, &entity)
+	m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, todo.Id).Updates(&entity).Count(&updatedCount)
+	// Update TodoExt
+	// m.DB.Model(&entity).Association("TodoExt").Append(&entity.TodoExt) // Not working, see https://github.com/go-gorm/gorm/issues/3487
+	// m.DB.Session(&gorm.Session{FullSaveAssociations: true}).Save(&entity) // This will work
+	m.DB.Model(dbtypes.TodoExt{}).Where(`"Id" = ?`, todo.TodoExt.Id).Updates(&entity.TodoExt)
 
-	// Update (Delete and create) tags mapping
+	// Update todo_tages
+	m.DB.Model(&entity).Association("Tags").Replace(entity.Tags)
+
+	// Optional: if we use the custom many-to-many relation table "TodoTags"
 	m.DB.Model(&dbtypes.TodoTag{}).Where(`"TodoId" = ?`, todo.Id).Delete(&dbtypes.TodoTag{})
 	tagIds := Map(todo.Tags, func(tag types.Tag) uuid.UUID {
 		return tag.Id
