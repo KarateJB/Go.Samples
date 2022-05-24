@@ -1,7 +1,6 @@
 ## API document
 
 ```s
-$ swag init  --parseDependency --parseInternal -g server.go
 ```
 
 
@@ -111,11 +110,7 @@ $ swag init
 
 # Or specified file name
 $ swag init -g|--generalInfo server.go
-2022/05/02 01:53:36 Generate swagger docs....
-2022/05/02 01:53:36 Generate general API Info, search dir:./
-2022/05/02 01:53:37 create docs.go at  docs/docs.go
-2022/05/02 01:53:37 create swagger.json at  docs/swagger.json
-2022/05/02 01:53:37 create swagger.yaml at  docs/swagger.yaml```
+$ swag init  --parseDependency --parseInternal -g server.go
 ```
 
 

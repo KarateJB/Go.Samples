@@ -66,6 +66,9 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity"
                     }
                 }
             },
@@ -201,6 +204,37 @@ const docTemplate = `{
             }
         },
         "/api/user": {
+            "put": {
+                "description": "The handler to edit a User",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "The User to be edited.",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.Todo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity"
+                    }
+                }
+            },
             "post": {
                 "description": "The handler to add a new User",
                 "consumes": [
@@ -231,22 +265,41 @@ const docTemplate = `{
                         "description": "Bad Request"
                     }
                 }
+            },
+            "delete": {
+                "description": "The handler to delete an exist User from User list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "The User to be deleted.",
+                        "name": "todo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.Todo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity"
+                    }
+                }
             }
         }
     },
     "definitions": {
-        "sql.NullTime": {
-            "type": "object",
-            "properties": {
-                "time": {
-                    "type": "string"
-                },
-                "valid": {
-                    "description": "Valid is true if Time is not NULL",
-                    "type": "boolean"
-                }
-            }
-        },
         "types.Priority": {
             "type": "object",
             "properties": {
@@ -278,26 +331,6 @@ const docTemplate = `{
                 "isDone": {
                     "type": "boolean"
                 },
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
-        "types.TodoD": {
-            "type": "object",
-            "properties": {
-                "createOn": {
-                    "type": "string"
-                },
-                "deleteOn": {
-                    "$ref": "#/definitions/sql.NullTime"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "isDone": {
-                    "type": "boolean"
-                },
                 "tags": {
                     "type": "array",
                     "items": {
@@ -308,10 +341,8 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "todoExt": {
+                    "description": "TrackDateTimes ` + "`" + `json:\"trackDateTimes\"` + "`" + `",
                     "$ref": "#/definitions/types.TodoExt"
-                },
-                "updateOn": {
-                    "$ref": "#/definitions/sql.NullTime"
                 },
                 "userId": {
                     "type": "string"
@@ -329,6 +360,9 @@ const docTemplate = `{
                 },
                 "priority": {
                     "$ref": "#/definitions/types.Priority"
+                },
+                "priorityId": {
+                    "type": "integer"
                 }
             }
         },
@@ -344,7 +378,7 @@ const docTemplate = `{
                 "todos": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/types.TodoD"
+                        "$ref": "#/definitions/types.Todo"
                     }
                 }
             }
