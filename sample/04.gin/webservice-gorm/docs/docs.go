@@ -33,7 +33,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/types.TodoPageData"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.Todo"
+                            }
                         }
                     }
                 }
@@ -81,7 +84,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/types.TodoPageData"
+                            "$ref": "#/definitions/types.Todo"
                         }
                     }
                 ],
@@ -157,7 +160,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/types.TodoPageData"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.Todo"
+                            }
                         }
                     }
                 }
@@ -193,9 +199,76 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/user": {
+            "post": {
+                "description": "The handler to add a new User",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "The new User to be created.",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/types.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "sql.NullTime": {
+            "type": "object",
+            "properties": {
+                "time": {
+                    "type": "string"
+                },
+                "valid": {
+                    "description": "Valid is true if Time is not NULL",
+                    "type": "boolean"
+                }
+            }
+        },
+        "types.Priority": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.Tag": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "types.Todo": {
             "type": "object",
             "properties": {
@@ -210,16 +283,68 @@ const docTemplate = `{
                 }
             }
         },
-        "types.TodoPageData": {
+        "types.TodoD": {
             "type": "object",
             "properties": {
-                "pageTitle": {
+                "createOn": {
+                    "type": "string"
+                },
+                "deleteOn": {
+                    "$ref": "#/definitions/sql.NullTime"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isDone": {
+                    "type": "boolean"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/types.Tag"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "todoExt": {
+                    "$ref": "#/definitions/types.TodoExt"
+                },
+                "updateOn": {
+                    "$ref": "#/definitions/sql.NullTime"
+                },
+                "userId": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.TodoExt": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "priority": {
+                    "$ref": "#/definitions/types.Priority"
+                }
+            }
+        },
+        "types.User": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 },
                 "todos": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/types.Todo"
+                        "$ref": "#/definitions/types.TodoD"
                     }
                 }
             }

@@ -1,4 +1,4 @@
-package dbaccess
+package dbservice
 
 import (
 	dbtypes "example/webservice/types/data_access"
@@ -55,16 +55,4 @@ func (m *DbAccess) InitData() {
 		{Id: uuid.New(), Name: "DevOps"},
 		{Id: uuid.New(), Name: "Programming"},
 	})
-}
-
-func (m *DbAccess) Create(entity interface{}) {
-	_ = m.DB.Create(entity)
-}
-
-func (m *DbAccess) BatchCreate(entities []interface{}, batchSize *int) {
-	if batchSize == nil {
-		m.DB.Create(entities)
-	} else {
-		m.DB.CreateInBatches(entities, *batchSize)
-	}
 }

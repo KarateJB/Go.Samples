@@ -2,7 +2,8 @@ package main
 
 import (
 	"example/webservice/docs"
-	dbaccess "example/webservice/services"
+	dbservice "example/webservice/services/db"
+	userservice "example/webservice/services/user"
 	types "example/webservice/types/api"
 	"net/http"
 	"strconv"
@@ -17,6 +18,7 @@ import (
 )
 
 var myTodoList []types.Todo
+var userService *userservice.UserAccess
 
 // @Title TODO API
 // @Version 1.0
@@ -33,8 +35,13 @@ func main() {
 		{Id: uuid.MustParse("cca89c32-a0d9-43c9-84e2-ae1224c5d755"), Title: "Task C", IsDone: true},
 	}
 
-	// Init Gin router
+	/* Init Gin router */
 	router := gin.Default()
+
+	// User
+	router.POST("api/user", postUser)
+
+	// Todo
 	router.GET("api/todo", getTodoList)
 	router.GET("api/todo/:id", getTodo) // The id is required for matching this routing
 	// router.GET("api/todo/*id", getTodoById) // The id is optional for matching this routing, e.q. api/todo/ or api/todo/xxx
@@ -56,9 +63,12 @@ func main() {
 
 	// DB connect configuration
 	dsn := "host=localhost user=postgres password=1qaz2wsx dbname=postgres port=5432 sslmode=disable TimeZone=UTC"
-	dbService := dbaccess.New(dsn, logger.Info)
+	dbService := dbservice.New(dsn, logger.Info)
 	dbService.Migrate()
 	dbService.InitData()
+
+	// Init services
+	userService = userservice.New(dbService.DB)
 
 	router.Run("localhost:8001")
 }
@@ -123,6 +133,26 @@ func searchTodo(c *gin.Context) {
 
 	// Serialize myTodoList to json and add it to reponse
 	c.IndentedJSON(http.StatusOK, matchedTodoList)
+}
+
+// @Title Create a new User
+// @Description The handler to add a new User
+// @Router /api/user [post]
+// @Param user body types.User true "The new User to be created."
+// @Accept json
+// @Produce json
+// @Success 201 {object} types.User
+// @Failure 400 "Bad Request"
+// postTodo: The handler to add a new User
+func postUser(c *gin.Context) {
+	var newUser types.User
+	if err := c.BindJSON(&newUser); err != nil {
+		// return
+		c.Writer.WriteHeader(http.StatusBadRequest)
+	}
+
+	userService.Create(&newUser)
+	c.IndentedJSON(http.StatusCreated, newUser)
 }
 
 // @Title Create a new TODO

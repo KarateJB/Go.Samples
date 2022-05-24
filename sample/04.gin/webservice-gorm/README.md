@@ -1,3 +1,10 @@
+## API document
+
+```s
+$ swag init  --parseDependency --parseInternal -g server.go
+```
+
+
 ## curl samples
 
 ### GET

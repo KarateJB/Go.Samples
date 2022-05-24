@@ -1,5 +1,27 @@
 basePath: /
 definitions:
+  sql.NullTime:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  types.Priority:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  types.Tag:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
   types.Todo:
     properties:
       id:
@@ -9,13 +31,47 @@ definitions:
       title:
         type: string
     type: object
-  types.TodoPageData:
+  types.TodoD:
     properties:
-      pageTitle:
+      createOn:
+        type: string
+      deleteOn:
+        $ref: '#/definitions/sql.NullTime'
+      id:
+        type: string
+      isDone:
+        type: boolean
+      tags:
+        items:
+          $ref: '#/definitions/types.Tag'
+        type: array
+      title:
+        type: string
+      todoExt:
+        $ref: '#/definitions/types.TodoExt'
+      updateOn:
+        $ref: '#/definitions/sql.NullTime'
+      userId:
+        type: string
+    type: object
+  types.TodoExt:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      priority:
+        $ref: '#/definitions/types.Priority'
+    type: object
+  types.User:
+    properties:
+      id:
+        type: string
+      name:
         type: string
       todos:
         items:
-          $ref: '#/definitions/types.Todo'
+          $ref: '#/definitions/types.TodoD'
         type: array
     type: object
 host: localhost:8001
@@ -59,7 +115,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/types.TodoPageData'
+            items:
+              $ref: '#/definitions/types.Todo'
+            type: array
     post:
       consumes:
       - application/json
@@ -70,7 +128,7 @@ paths:
         name: todo
         required: true
         schema:
-          $ref: '#/definitions/types.TodoPageData'
+          $ref: '#/definitions/types.Todo'
       produces:
       - application/json
       responses:
@@ -139,5 +197,28 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/types.TodoPageData'
+            items:
+              $ref: '#/definitions/types.Todo'
+            type: array
+  /api/user:
+    post:
+      consumes:
+      - application/json
+      description: The handler to add a new User
+      parameters:
+      - description: The new User to be created.
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/types.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/types.User'
+        "400":
+          description: Bad Request
 swagger: "2.0"
