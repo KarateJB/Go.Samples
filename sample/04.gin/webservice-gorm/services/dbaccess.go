@@ -17,6 +17,7 @@ type DbAccess struct {
 	Error error
 }
 
+// New: create and get the Database access instance
 func New(dsn string, logLevel logger.LogLevel) *DbAccess {
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: logger.Default.LogMode(logLevel)})
 	if err != nil {
@@ -28,12 +29,13 @@ func New(dsn string, logLevel logger.LogLevel) *DbAccess {
 	}
 }
 
+// Migrate: database migration
 func (m *DbAccess) Migrate() {
 	// Migrate
 	m.DB.AutoMigrate(&dbtypes.Priority{}, &dbtypes.User{}, &dbtypes.Todo{}, &dbtypes.TodoExt{}, &dbtypes.Tag{}, &dbtypes.TodoTag{})
 }
 
-// initData: Initialize data
+// InitData: Initialize data
 func (m *DbAccess) InitData() {
 	// Init Priorities
 	m.DB.Create(&[]dbtypes.Priority{
@@ -55,6 +57,14 @@ func (m *DbAccess) InitData() {
 	})
 }
 
-func (m *DbAccess) Create(entity dbtypes.User) {
+func (m *DbAccess) Create(entity interface{}) {
+	_ = m.DB.Create(entity)
+}
 
+func (m *DbAccess) BatchCreate(entities []interface{}, batchSize *int) {
+	if batchSize == nil {
+		m.DB.Create(entities)
+	} else {
+		m.DB.CreateInBatches(entities, *batchSize)
+	}
 }
