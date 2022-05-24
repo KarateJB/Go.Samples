@@ -1,8 +1,11 @@
 package todoservice
 
 import (
+	"database/sql"
 	types "example/webservice/types/api"
 	dbtypes "example/webservice/types/db"
+	"example/webservice/utils"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/stroiman/go-automapper"
@@ -45,10 +48,10 @@ func (m *TodoAccess) Create(todo *types.Todo) *dbtypes.Todo {
 	m.DB.Model(&entity).Association("Tags").Append(entity.Tags)
 
 	// Optional: if we use the custom many-to-many relation table "TodoTags"
-	tagIds := Map(todo.Tags, func(tag types.Tag) uuid.UUID {
+	tagIds := utils.Map(todo.Tags, func(tag types.Tag) uuid.UUID {
 		return tag.Id
 	})
-	todoTags := Map(tagIds, func(tagId uuid.UUID) dbtypes.TodoTag {
+	todoTags := utils.Map(tagIds, func(tagId uuid.UUID) dbtypes.TodoTag {
 		return dbtypes.TodoTag{TodoId: entity.Id, TagId: tagId}
 	})
 
@@ -61,11 +64,18 @@ func (m *TodoAccess) Update(todo *types.Todo) int64 {
 	var entity dbtypes.Todo
 	var updatedCount int64
 
-	// Update TODO
 	automapper.MapLoose(todo, &entity)
+
+	// Update TODO
+	entity.TrackDateTimes = dbtypes.TrackDateTimes{
+		UpdateOn: sql.NullTime{
+			Time:  time.Now(),
+			Valid: true,
+		},
+	}
 	m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, todo.Id).Updates(&entity).Count(&updatedCount)
 	// Update TodoExt
-	// m.DB.Model(&entity).Association("TodoExt").Append(&entity.TodoExt) // Not working, see https://github.com/go-gorm/gorm/issues/3487
+	// m.DB.Model(&entity).Association("TodoExt").Append(&entity.TodoExt) // Not work, see https://github.com/go-gorm/gorm/issues/3487
 	// m.DB.Session(&gorm.Session{FullSaveAssociations: true}).Save(&entity) // This will work
 	m.DB.Model(dbtypes.TodoExt{}).Where(`"Id" = ?`, todo.TodoExt.Id).Updates(&entity.TodoExt)
 
@@ -74,10 +84,10 @@ func (m *TodoAccess) Update(todo *types.Todo) int64 {
 
 	// Optional: if we use the custom many-to-many relation table "TodoTags"
 	m.DB.Model(&dbtypes.TodoTag{}).Where(`"TodoId" = ?`, todo.Id).Delete(&dbtypes.TodoTag{})
-	tagIds := Map(todo.Tags, func(tag types.Tag) uuid.UUID {
+	tagIds := utils.Map(todo.Tags, func(tag types.Tag) uuid.UUID {
 		return tag.Id
 	})
-	todoTags := Map(tagIds, func(tagId uuid.UUID) dbtypes.TodoTag {
+	todoTags := utils.Map(tagIds, func(tagId uuid.UUID) dbtypes.TodoTag {
 		return dbtypes.TodoTag{TodoId: todo.Id, TagId: tagId}
 	})
 	m.DB.Create(&todoTags)
@@ -87,21 +97,13 @@ func (m *TodoAccess) Update(todo *types.Todo) int64 {
 
 // Delete: delete a todo
 func (m *TodoAccess) Delete(todo *types.Todo) int64 {
+	// Optional: If we don't set CASCADE delete, then we can use Association to remove the relations, e.q. relations in todo_tags as following.
+	// var entity dbtypes.Todo
+	// m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, todo.Id).Preload("Tags").First(&entity)
+	// m.DB.Model(&entity).Association("Tags").Delete(entity.Tags)
+
 	var count int64
 	m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, todo.Id).Count(&count).Delete(&dbtypes.Todo{})
+
 	return count
-}
-
-// Map: map A array to B array
-// TODO: refactor
-func Map[S, D any](src []S, f func(S) D) []D {
-	us := make([]D, len(src))
-	for i := range src {
-		us[i] = f(src[i])
-	}
-	return us
-}
-
-func getTagId(src types.Tag) uuid.UUID {
-	return src.Id
 }

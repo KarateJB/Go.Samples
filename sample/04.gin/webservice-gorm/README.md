@@ -25,7 +25,7 @@ curl --include http://localhost:8001/api/todo/a2a25eb2-9bf7-4cb6-b9db-ece05b78e9
 curl -X POST "http://localhost:8001/api/todo" --include --header "Content-Type: application/json" \
   --data '{ "title": "XXXX", "isDone": false, "userId": "JB", "todoExt": {"description": "YYYY", "priorityId": 2}, "tags": [{"id": "6aee5542-3f70-4cbc-ab05-fd020285f021"}, {"id": "dcc5a568-ae07-4600-9055-97eb129f319c"}] }'
 
-curl -X DELETE "http://localhost:8001/api/todo" --include --header "Content-Type: application/json" --data '{"id": "cc60d150-0b6d-4ac0-a4ba-1e48f42b23b7"}'
+curl -X DELETE "http://localhost:8001/api/todo" --include --header "Content-Type: application/json" --data '{"id": "a2a25eb2-9bf7-4cb6-b9db-ece05b78e975"}'
 
 curl -X PUT "http://localhost:8001/api/todo" --include --header "Content-Type: application/json" \
   --data '{ "id": "a2a25eb2-9bf7-4cb6-b9db-ece05b78e975", "title": "ZZZZ", "isDone": true, "userId": "JB", "todoExt": {"id": "a2a25eb2-9bf7-4cb6-b9db-ece05b78e975", "description": "WWWW", "priorityId": 3}, "tags": [{"id": "6aee5542-3f70-4cbc-ab05-fd020285f021"}] }'
