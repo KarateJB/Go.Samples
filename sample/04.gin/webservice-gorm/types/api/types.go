@@ -14,30 +14,31 @@ type TrackDateTimes struct {
 }
 
 type User struct {
-	Id     string  `json:"id"`
-	Name   string  `json:"name"`
-	TodoDs []TodoD `json:"todos,omitempty"`
+	Id     string `json:"id"`
+	Name   string `json:"name"`
+	TodoDs []Todo `json:"todos,omitempty"`
 }
+
+// type Todo struct {
+// 	Id     uuid.UUID `json:"id"`
+// 	Title  string    `json:"title"`
+// 	IsDone bool      `json:"isDone"`
+// }
 
 type Todo struct {
 	Id     uuid.UUID `json:"id"`
 	Title  string    `json:"title"`
 	IsDone bool      `json:"isDone"`
-}
-
-type TodoD struct {
-	Id             uuid.UUID `json:"id"`
-	Title          string    `json:"title"`
-	IsDone         bool      `json:"isDone"`
-	TrackDateTimes `json:"trackDateTimes"`
-	TodoExt        TodoExt `json:"todoExt"`
-	UserId         string  `json:"userId"`
-	Tags           []Tag   `json:"tags"`
+	// TrackDateTimes `json:"trackDateTimes"`
+	TodoExt TodoExt `json:"todoExt"`
+	UserId  string  `json:"userId"`
+	Tags    []Tag   `json:"tags"`
 }
 
 type TodoExt struct {
 	Id          uuid.UUID `json:"id"`
 	Description string    `json:"description"`
+	PriorityId  int       `json:"priorityId"`
 	Priority    Priority  `json:""`
 }
 

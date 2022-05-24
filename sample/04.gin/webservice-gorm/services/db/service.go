@@ -52,7 +52,7 @@ func (m *DbAccess) InitData() {
 	})
 
 	m.DB.Create(&[]dbtypes.Tag{
-		{Id: uuid.New(), Name: "DevOps"},
-		{Id: uuid.New(), Name: "Programming"},
+		{Id: uuid.MustParse("6aee5542-3f70-4cbc-ab05-fd020285f021"), Name: "DevOps"},
+		{Id: uuid.MustParse("dcc5a568-ae07-4600-9055-97eb129f319c"), Name: "Programming"},
 	})
 }

@@ -30,9 +30,9 @@ type Todo struct {
 	Title          string    `gorm:"column:Title;not null"`
 	IsDone         bool      `gorm:"column:IsDone;not null;default:false"`
 	TrackDateTimes           // Or use gorm.Model instead
-	TodoExt        TodoExt   `gorm:"foreignkey:Id;references:Id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"` // HasOne relation on "TodoExt". The "TodoExt" will has a foreign key "Id" which has reference on "Todo"."Id"
-	UserId         string    `gorm:"column:UserId;default:NULL"`                                                // If this field name is "UserId", we can ignore setting "foreignKey:Id" on "User" struct's field "Todos"
-	Tags           []*Tag    `gorm:"many2many:TodoTags;foreignKey:Id;"`                                         // Many to many relation
+	TodoExt        TodoExt   `gorm:"foreignkey:Id;references:Id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`      // HasOne relation on "TodoExt". The "TodoExt" will has a foreign key "Id" which has reference on "Todo"."Id"
+	UserId         string    `gorm:"column:UserId;default:NULL"`                                                     // If this field name is "UserId", we can ignore setting "foreignKey:Id" on "User" struct's field "Todos"
+	Tags           []*Tag    `gorm:"many2many:TodoTags;foreignKey:Id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"` // Many to many relation
 }
 
 // TodoExt: Todo's extension table
@@ -47,7 +47,7 @@ type TodoExt struct {
 type Tag struct {
 	Id    uuid.UUID `gorm:"column:Id;type:uuid;primaryKey;default:uuid_generate_v4()"`
 	Name  string    `gorm:"column:Name;size:200;not null"`
-	Todos []*Todo   `gorm:"many2many:TodoTags;foreignKey:Id;"` // Many to many relation
+	Todos []*Todo   `gorm:"many2many:TodoTags;foreignKey:Id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"` // Many to many relation
 }
 
 // Priority: Mapping table

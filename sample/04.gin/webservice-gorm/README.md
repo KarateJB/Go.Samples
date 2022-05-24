@@ -11,11 +11,21 @@ $ swag init  --parseDependency --parseInternal -g server.go
 
 curl -X POST "http://localhost:8001/api/user" --include --header "Content-Type: application/json" --data '{"Id": "JB", "Name": "JB Lin"}'
 
-curl http://localhost:8001/api/user/JB
+curl --include http://localhost:8001/api/user/JB
+
+curl -X PUT "http://localhost:8001/api/user" --include --header "Content-Type: application/json" --data '{"id": "JB", "name": "Bon Jovi"}'
 
 curl -X DELETE "http://localhost:8001/api/user" --include --header "Content-Type: application/json" --data '{"id": "JB"}'
 ```
 
+
+```s
+curl --include http://localhost:8001/api/todo/708d0dde-5974-4e18-abf8-a2d2054e1aed
+
+curl -X POST "http://localhost:8001/api/todo" --include --header "Content-Type: application/json" \
+  --data '{ "title": "XXXX", "isDone": false, "userId": "JB", "todoExt": {"description": "YYYY", "priorityId": 2}, "tags": [{"id": "6aee5542-3f70-4cbc-ab05-fd020285f021"}, {"id": "dcc5a568-ae07-4600-9055-97eb129f319c"}] }'
+
+```
 
 ### GET
 

@@ -40,11 +40,13 @@ func (m *UserAccess) Create(user *types.User) {
 }
 
 // Update: update a user
-func (m *UserAccess) Update(user *types.User) {
-	var entity dbtypes.User
-	m.DB.First(&entity, user.Id).Updates(dbtypes.User{
+func (m *UserAccess) Update(user *types.User) int64 {
+	var updatedCount int64
+	m.DB.Model(&dbtypes.User{}).Where(`"Id" = ?`, user.Id).Updates(dbtypes.User{
 		Name: user.Name,
-	})
+	}).Count(&updatedCount)
+
+	return updatedCount
 }
 
 // Delete: delete a user

@@ -3,6 +3,7 @@ package main
 import (
 	"example/webservice/docs"
 	dbservice "example/webservice/services/db"
+	todoservice "example/webservice/services/todo"
 	userservice "example/webservice/services/user"
 	types "example/webservice/types/api"
 	"net/http"
@@ -13,12 +14,12 @@ import (
 	"github.com/google/uuid"
 	swagger "github.com/swaggo/gin-swagger"
 	swaggerfiles "github.com/swaggo/gin-swagger/swaggerFiles"
-	"golang.org/x/exp/slices"
 	"gorm.io/gorm/logger"
 )
 
 var myTodoList []types.Todo
 var userService *userservice.UserAccess
+var todoService *todoservice.TodoAccess
 
 // @Title TODO API
 // @Version 1.0
@@ -41,6 +42,7 @@ func main() {
 	// User
 	router.GET("api/user/:id", getUser)
 	router.POST("api/user", postUser)
+	router.PUT("api/user", putUser)
 	router.DELETE("api/user", deleteUser)
 
 	// Todo
@@ -71,6 +73,7 @@ func main() {
 
 	// Init services
 	userService = userservice.New(dbService.DB)
+	todoService = todoservice.New(dbService.DB)
 
 	router.Run("localhost:8001")
 }
@@ -86,11 +89,9 @@ func main() {
 // getTodo: The handler for getting the User by Id
 func getUser(c *gin.Context) {
 	id := c.Param("id") // Get the value from api/user/:id
-	user := userService.Get(id)
 
-	if user == nil {
-		// If not found, response 204
-		c.Writer.WriteHeader(http.StatusNoContent)
+	if user := userService.Get(id); user == nil {
+		c.Writer.WriteHeader(http.StatusNoContent) // If not found, response 204
 	} else {
 		c.IndentedJSON(http.StatusOK, user)
 	}
@@ -120,17 +121,13 @@ func getTodoList(c *gin.Context) {
 // getTodo: The handler for getting the TODO by Id
 func getTodo(c *gin.Context) {
 	id := c.Param("id") // Get the value from api/todo/:id
+	uuid, _ := uuid.Parse(id)
 
-	// Search the matched TODO from the list by Id.
-	for _, todo := range myTodoList {
-		if todo.Id.String() == id {
-			c.IndentedJSON(http.StatusOK, todo)
-			return
-		}
+	if todo := todoService.Get(uuid); todo == nil {
+		c.Writer.WriteHeader(http.StatusNoContent) // If not found, response 204
+	} else {
+		c.IndentedJSON(http.StatusOK, todo)
 	}
-
-	// If not found, response 204
-	c.Writer.WriteHeader(http.StatusNoContent)
 }
 
 // @Title Search TODOs
@@ -141,7 +138,6 @@ func getTodo(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 200 {array} types.Todo "OK"
-// searchTodo: The handler for searching the TODOs by title and isDone
 func searchTodo(c *gin.Context) {
 	queryValIsDone, _ := strconv.ParseBool(c.DefaultQuery("isDone", "false"))
 	queryValTitle := c.Query("title")
@@ -166,7 +162,6 @@ func searchTodo(c *gin.Context) {
 // @Produce json
 // @Success 201 {object} types.User
 // @Failure 400 "Bad Request"
-// postTodo: The handler to add a new User
 func postUser(c *gin.Context) {
 	var newUser types.User
 	if err := c.BindJSON(&newUser); err != nil {
@@ -186,16 +181,40 @@ func postUser(c *gin.Context) {
 // @Produce json
 // @Success 201 {object} types.Todo
 // @Failure 400 "Bad Request"
-// postTodo: The handler to add a new TODO
 func postTodo(c *gin.Context) {
 	var newTodo types.Todo
 	if err := c.BindJSON(&newTodo); err != nil {
 		// return
 		c.Writer.WriteHeader(http.StatusBadRequest)
 	}
-	newTodo.Id = uuid.New() // Set Id
-	myTodoList = append(myTodoList, newTodo)
+
+	entity := todoService.Create(&newTodo)
+
+	// Get the auto-generated Id
+	newTodo.Id = entity.Id
+	newTodo.TodoExt.Id = entity.TodoExt.Id
+
 	c.IndentedJSON(http.StatusCreated, newTodo)
+}
+
+// @Title Edit a User
+// @Description The handler to edit a User
+// @Router /api/user [put]
+// @Param user body types.Todo true "The User to be edited."
+// @Accept json
+// @Produce json
+// @Success 200 "OK"
+// @Failure 400 "Bad Request"
+// @Failure 422 "Unprocessable Entity"
+func putUser(c *gin.Context) {
+	var editUser types.User
+	if err := c.BindJSON(&editUser); err != nil {
+		c.Writer.WriteHeader(http.StatusBadRequest)
+	}
+
+	if count := userService.Update(&editUser); count == 0 {
+		c.Writer.WriteHeader(http.StatusUnprocessableEntity)
+	}
 }
 
 // @Title Edit a TODO
@@ -206,26 +225,16 @@ func postTodo(c *gin.Context) {
 // @Produce json
 // @Success 200 "OK"
 // @Failure 400 "Bad Request"
-// putTodo: The handler to edit a TODO
+// @Failure 422 "Unprocessable Entity"
 func putTodo(c *gin.Context) {
 	var editTodo types.Todo
 	if err := c.BindJSON(&editTodo); err != nil {
 		c.Writer.WriteHeader(http.StatusBadRequest)
 	}
 
-	for index, todo := range myTodoList {
-		if todo.Id == editTodo.Id {
-			myTodoList[index].Title, myTodoList[index].IsDone = editTodo.Title, editTodo.IsDone
-
-			// range copies the values from the slice that iterated over, so below code wont work.
-			// todo.Title = editTodo.Title
-			// todo.IsDone = editTodo.IsDone
-
-			return
-		}
+	if count := todoService.Update(&editTodo); count == 0 {
+		c.Writer.WriteHeader(http.StatusUnprocessableEntity)
 	}
-
-	c.Writer.WriteHeader(http.StatusBadRequest)
 }
 
 // @Title Delete a User
@@ -237,7 +246,6 @@ func putTodo(c *gin.Context) {
 // @Success 200 "OK"
 // @Failure 400 "Bad Request"
 // @Failure 422 "Unprocessable Entity"
-// deleteTodo: The handler to delete an exist User from User list
 func deleteUser(c *gin.Context) {
 	var deleteUser types.User
 	if err := c.BindJSON(&deleteUser); err != nil {
@@ -245,7 +253,7 @@ func deleteUser(c *gin.Context) {
 	}
 
 	if count := userService.Delete(&deleteUser); count == 0 {
-		c.Writer.WriteHeader(http.StatusBadRequest)
+		c.Writer.WriteHeader(http.StatusUnprocessableEntity)
 	}
 }
 
@@ -258,31 +266,13 @@ func deleteUser(c *gin.Context) {
 // @Success 200 "OK"
 // @Failure 400 "Bad Request"
 // @Failure 422 "Unprocessable Entity"
-// deleteTodo: The handler to delete an exist TODO from TODO list
 func deleteTodo(c *gin.Context) {
 	var deleteTodo types.Todo
 	if err := c.BindJSON(&deleteTodo); err != nil {
 		c.Writer.WriteHeader(http.StatusBadRequest)
 	}
 
-	// We can find the index if the request contains the full values of the item.
-	removeIndex := slices.Index(myTodoList, deleteTodo)
-
-	// But if we only has ID from the request, then get the index by comparing the Id.
-	if removeIndex < 0 {
-		for index, todo := range myTodoList {
-			if todo.Id == deleteTodo.Id {
-				removeIndex = index
-				break
-			}
-		}
-	}
-
-	// Try removing the TODO from list
-	if removeIndex >= 0 {
-		myTodoList = slices.Delete(myTodoList, removeIndex, removeIndex+1)
-		// fmt.Println(myTodoList)
-	} else {
+	if count := todoService.Delete(&deleteTodo); count == 0 {
 		c.Writer.WriteHeader(http.StatusUnprocessableEntity)
 	}
 }
