@@ -124,49 +124,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/todo/search": {
-            "get": {
-                "description": "The handler for searching the TODOs by Title and IsDone",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Todo"
-                ],
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Contained keyword for TODO's Title.",
-                        "name": "title",
-                        "in": "query"
-                    },
-                    {
-                        "type": "boolean",
-                        "default": false,
-                        "description": "Matched value for TODO's IsDone.",
-                        "name": "isDone",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/types.Todo"
-                            }
-                        }
-                    },
-                    "204": {
-                        "description": "No Content"
-                    }
-                }
-            }
-        },
         "/api/todo/{id}": {
             "get": {
                 "description": "The handler for getting the TODO by Id",
@@ -259,6 +216,49 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/api/todos/search": {
+            "get": {
+                "description": "The handler for searching the TODOs by Title and IsDone",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todos"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Contained keyword for TODO's Title.",
+                        "name": "title",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Matched value for TODO's IsDone.",
+                        "name": "isDone",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.Todo"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
                     }
                 }
             }

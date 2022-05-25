@@ -48,7 +48,6 @@ func main() {
 		{
 			todoRg.GET(":id", getTodo) // The id is required for matching this routing
 			// todoRg.GET("*id", getTodoById) // The id is optional for matching this routing, e.q. api/todo/ or api/todo/xxx
-			todoRg.GET("search", searchTodo)
 			todoRg.POST("", postTodo)
 			todoRg.PUT("", putTodo)
 			todoRg.DELETE("", deleteTodo)
@@ -56,6 +55,7 @@ func main() {
 		todosRg := apiRouterGroup.Group("/todos")
 		{
 			todosRg.GET("", getAllTodos)
+			todosRg.GET("search", searchTodo)
 			todosRg.DELETE("", deleteTodos)
 		}
 	}
@@ -139,10 +139,10 @@ func getTodo(c *gin.Context) {
 	}
 }
 
-// @Tags Todo
+// @Tags Todos
 // @Title Search TODOs
 // @Description The handler for searching the TODOs by Title and IsDone
-// @Router /api/todo/search [get]
+// @Router /api/todos/search [get]
 // @Param title query string false "Contained keyword for TODO's Title."
 // @Param isDone query boolean false "Matched value for TODO's IsDone." default(false)
 // @Accept json

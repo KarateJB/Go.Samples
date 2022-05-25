@@ -153,34 +153,6 @@ paths:
           description: No Content
       tags:
       - Todo
-  /api/todo/search:
-    get:
-      consumes:
-      - application/json
-      description: The handler for searching the TODOs by Title and IsDone
-      parameters:
-      - description: Contained keyword for TODO's Title.
-        in: query
-        name: title
-        type: string
-      - default: false
-        description: Matched value for TODO's IsDone.
-        in: query
-        name: isDone
-        type: boolean
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/types.Todo'
-            type: array
-        "204":
-          description: No Content
-      tags:
-      - Todo
   /api/todos:
     delete:
       consumes:
@@ -208,6 +180,34 @@ paths:
       consumes:
       - application/json
       description: The handler to response the TODO list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.Todo'
+            type: array
+        "204":
+          description: No Content
+      tags:
+      - Todos
+  /api/todos/search:
+    get:
+      consumes:
+      - application/json
+      description: The handler for searching the TODOs by Title and IsDone
+      parameters:
+      - description: Contained keyword for TODO's Title.
+        in: query
+        name: title
+        type: string
+      - default: false
+        description: Matched value for TODO's IsDone.
+        in: query
+        name: isDone
+        type: boolean
       produces:
       - application/json
       responses:
