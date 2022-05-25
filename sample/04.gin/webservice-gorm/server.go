@@ -8,7 +8,6 @@ import (
 	types "example/webservice/types/api"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -139,19 +138,14 @@ func getTodo(c *gin.Context) {
 // @Produce json
 // @Success 200 {array} types.Todo "OK"
 func searchTodo(c *gin.Context) {
-	queryValIsDone, _ := strconv.ParseBool(c.DefaultQuery("isDone", "false"))
 	queryValTitle := c.Query("title")
+	queryValIsDone, _ := strconv.ParseBool(c.DefaultQuery("isDone", "false"))
 
-	var matchedTodoList []types.Todo
-
-	for _, todo := range myTodoList {
-		if todo.IsDone == queryValIsDone && strings.Contains(todo.Title, queryValTitle) {
-			matchedTodoList = append(matchedTodoList, todo)
-		}
+	if todos := todoService.Search(queryValTitle, queryValIsDone); todos == nil {
+		c.Writer.WriteHeader(http.StatusNoContent)
+	} else {
+		c.IndentedJSON(http.StatusOK, todos)
 	}
-
-	// Serialize myTodoList to json and add it to reponse
-	c.IndentedJSON(http.StatusOK, matchedTodoList)
 }
 
 // @Title Create a new User

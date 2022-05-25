@@ -5,6 +5,7 @@ import (
 	types "example/webservice/types/api"
 	dbtypes "example/webservice/types/db"
 	"example/webservice/utils"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -38,6 +39,28 @@ func (m *TodoAccess) Get(id uuid.UUID) *types.Todo {
 		automapper.MapLoose(entity, &todo)
 	}
 	return todo
+}
+
+// Search: search TODOs that its Title contains "queryValTitle" and IsDone matchs "queryValIsDone"
+func (m *TodoAccess) Search(queryValTitle string, queryValIsDone bool) *[]types.Todo {
+	var entities *[]dbtypes.Todo
+	var todos *[]types.Todo
+	var count int64
+
+	m.DB.Model(entities).
+		Where(`"Title" LIKE ?`, fmt.Sprintf("%%%s%%", queryValTitle)). // Or use strings.Builder
+		Where(`"IsDone" = ?`, queryValIsDone).Preload(clause.Associations).
+		Preload("TodoExt.Priority").Find(&entities).Count(&count)
+
+	if count > 0 {
+		for _, entity := range *entities {
+			var todo types.Todo
+			automapper.MapLoose(entity, &todo)
+			*todos = append(*todos, todo)
+		}
+	}
+
+	return todos
 }
 
 // Create: create a new todo

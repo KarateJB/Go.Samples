@@ -1,13 +1,7 @@
-## API document
-
-```s
-```
-
 
 ## curl samples
 
 ```s
-
 curl -X POST "http://localhost:8001/api/user" --include --header "Content-Type: application/json" --data '{"Id": "JB", "Name": "JB Lin"}'
 
 curl --include http://localhost:8001/api/user/JB
@@ -20,6 +14,10 @@ curl -X DELETE "http://localhost:8001/api/user" --include --header "Content-Type
 
 ```s
 curl --include http://localhost:8001/api/todo/a2a25eb2-9bf7-4cb6-b9db-ece05b78e975
+
+curl --include http://localhost:8001/api/todo/search?title=Task%20A
+curl --include http://localhost:8001/api/todo/search?title=Task&isDone=true
+curl --include http://localhost:8001/api/todo/search?title=B&isDone=true
 
 curl -X POST "http://localhost:8001/api/todo" --include --header "Content-Type: application/json" \
   --data '{ "title": "XXXX", "isDone": false, "userId": "JB", "todoExt": {"description": "YYYY", "priorityId": 2}, "tags": [{"id": "6aee5542-3f70-4cbc-ab05-fd020285f021"}, {"id": "dcc5a568-ae07-4600-9055-97eb129f319c"}] }'
