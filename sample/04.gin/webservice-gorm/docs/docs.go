@@ -21,26 +21,6 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/api/todo": {
-            "get": {
-                "description": "The handler to response the TODO list",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/types.Todo"
-                            }
-                        }
-                    }
-                }
-            },
             "put": {
                 "description": "The handler to edit a TODO",
                 "consumes": [
@@ -48,6 +28,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Todo"
                 ],
                 "parameters": [
                     {
@@ -80,6 +63,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Todo"
+                ],
                 "parameters": [
                     {
                         "description": "The new TODO to be created.",
@@ -104,24 +90,24 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "The handler to delete TODOs",
+                "description": "The handler to delete an TODO",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Todo"
+                ],
                 "parameters": [
                     {
-                        "description": "The TODOs to be deleted.",
+                        "description": "The TODO to be deleted.",
                         "name": "todo",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/types.Todo"
-                            }
+                            "$ref": "#/definitions/types.Todo"
                         }
                     }
                 ],
@@ -131,6 +117,9 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity"
                     }
                 }
             }
@@ -143,6 +132,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Todo"
                 ],
                 "parameters": [
                     {
@@ -168,6 +160,9 @@ const docTemplate = `{
                                 "$ref": "#/definitions/types.Todo"
                             }
                         }
+                    },
+                    "204": {
+                        "description": "No Content"
                     }
                 }
             }
@@ -180,6 +175,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Todo"
                 ],
                 "parameters": [
                     {
@@ -203,6 +201,68 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/todos": {
+            "get": {
+                "description": "The handler to response the TODO list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todos"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.Todo"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            },
+            "delete": {
+                "description": "The handler to delete TODOs by their Id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todos"
+                ],
+                "parameters": [
+                    {
+                        "description": "The TODOs to be deleted.",
+                        "name": "todo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.Todo"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
         "/api/user": {
             "put": {
                 "description": "The handler to edit a User",
@@ -211,6 +271,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "User"
                 ],
                 "parameters": [
                     {
@@ -243,6 +306,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "User"
+                ],
                 "parameters": [
                     {
                         "description": "The new User to be created.",
@@ -274,6 +340,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "User"
+                ],
                 "parameters": [
                     {
                         "description": "The User to be deleted.",
@@ -294,6 +363,40 @@ const docTemplate = `{
                     },
                     "422": {
                         "description": "Unprocessable Entity"
+                    }
+                }
+            }
+        },
+        "/api/user/{id}": {
+            "get": {
+                "description": "The handler for getting the User by Id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "The User's Id.",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.User"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
                     }
                 }
             }

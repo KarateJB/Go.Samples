@@ -68,16 +68,14 @@ paths:
     delete:
       consumes:
       - application/json
-      description: The handler to delete TODOs
+      description: The handler to delete an TODO
       parameters:
-      - description: The TODOs to be deleted.
+      - description: The TODO to be deleted.
         in: body
         name: todo
         required: true
         schema:
-          items:
-            $ref: '#/definitions/types.Todo'
-          type: array
+          $ref: '#/definitions/types.Todo'
       produces:
       - application/json
       responses:
@@ -85,19 +83,10 @@ paths:
           description: OK
         "400":
           description: Bad Request
-    get:
-      consumes:
-      - application/json
-      description: The handler to response the TODO list
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/types.Todo'
-            type: array
+        "422":
+          description: Unprocessable Entity
+      tags:
+      - Todo
     post:
       consumes:
       - application/json
@@ -118,6 +107,8 @@ paths:
             $ref: '#/definitions/types.Todo'
         "400":
           description: Bad Request
+      tags:
+      - Todo
     put:
       consumes:
       - application/json
@@ -138,6 +129,8 @@ paths:
           description: Bad Request
         "422":
           description: Unprocessable Entity
+      tags:
+      - Todo
   /api/todo/{id}:
     get:
       consumes:
@@ -158,6 +151,8 @@ paths:
             $ref: '#/definitions/types.Todo'
         "204":
           description: No Content
+      tags:
+      - Todo
   /api/todo/search:
     get:
       consumes:
@@ -182,6 +177,50 @@ paths:
             items:
               $ref: '#/definitions/types.Todo'
             type: array
+        "204":
+          description: No Content
+      tags:
+      - Todo
+  /api/todos:
+    delete:
+      consumes:
+      - application/json
+      description: The handler to delete TODOs by their Id
+      parameters:
+      - description: The TODOs to be deleted.
+        in: body
+        name: todo
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/types.Todo'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      tags:
+      - Todos
+    get:
+      consumes:
+      - application/json
+      description: The handler to response the TODO list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.Todo'
+            type: array
+        "204":
+          description: No Content
+      tags:
+      - Todos
   /api/user:
     delete:
       consumes:
@@ -203,6 +242,8 @@ paths:
           description: Bad Request
         "422":
           description: Unprocessable Entity
+      tags:
+      - User
     post:
       consumes:
       - application/json
@@ -223,6 +264,8 @@ paths:
             $ref: '#/definitions/types.User'
         "400":
           description: Bad Request
+      tags:
+      - User
     put:
       consumes:
       - application/json
@@ -243,4 +286,28 @@ paths:
           description: Bad Request
         "422":
           description: Unprocessable Entity
+      tags:
+      - User
+  /api/user/{id}:
+    get:
+      consumes:
+      - application/json
+      description: The handler for getting the User by Id
+      parameters:
+      - description: The User's Id.
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.User'
+        "204":
+          description: No Content
+      tags:
+      - User
 swagger: "2.0"

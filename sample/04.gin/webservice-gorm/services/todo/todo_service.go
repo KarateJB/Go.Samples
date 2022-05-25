@@ -39,8 +39,10 @@ func (m *TodoAccess) GetAll() *[]types.Todo {
 			automapper.MapLoose(entity, &todo)
 			todos = append(todos, todo)
 		}
+		return &todos
+	} else {
+		return nil
 	}
-	return &todos
 }
 
 // GetOne: get the TODO by Id
@@ -75,9 +77,11 @@ func (m *TodoAccess) Search(queryValTitle string, queryValIsDone bool) *[]types.
 			automapper.MapLoose(entity, &todo)
 			todos = append(todos, todo)
 		}
+		return &todos
+	} else {
+		return nil
 	}
 
-	return &todos
 }
 
 // Create: create a new TODO

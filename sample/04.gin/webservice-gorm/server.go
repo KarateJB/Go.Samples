@@ -18,7 +18,6 @@ import (
 
 const HTTP_HEADER_ROW_COUNT = "X-Row-Count"
 
-var myTodoList []types.Todo
 var userService *userservice.UserAccess
 var todoService *todoservice.TodoAccess
 
@@ -31,11 +30,6 @@ var todoService *todoservice.TodoAccess
 // @Contact.Url https://karatejb.blogspot.com/
 // @Contact.Email xxx@demo.com
 func main() {
-	myTodoList = []types.Todo{
-		{Id: uuid.MustParse("aa3cdd2f-17b9-4f43-9eb0-af56b42908c5"), Title: "Task A", IsDone: false},
-		{Id: uuid.MustParse("bbf5d05c-c442-4869-8326-ab5cfa832f6a"), Title: "Task B", IsDone: true},
-		{Id: uuid.MustParse("cca89c32-a0d9-43c9-84e2-ae1224c5d755"), Title: "Task C", IsDone: true},
-	}
 
 	/* Init Gin router */
 	router := gin.Default()
@@ -91,15 +85,14 @@ func main() {
 }
 
 // @Tags User
-// @Title Get a User by its Id
+// @Title Get the User by Id
 // @Description The handler for getting the User by Id
-// @Router /api/todo/{id} [get]
-// @Param id path string true "A User's Id."
+// @Router /api/user/{id} [get]
+// @Param id path string true "The User's Id."
 // @Accept json
 // @Produce json
-// @Success 200 {object} types.Todo "OK"
+// @Success 200 {object} types.User "OK"
 // @Success 204 "No Content"
-// getTodo: The handler for getting the User by Id
 func getUser(c *gin.Context) {
 	id := c.Param("id") // Get the value from api/user/:id
 
@@ -113,17 +106,21 @@ func getUser(c *gin.Context) {
 // @Tags Todos
 // @Title Get all TODOs
 // @Description The handler to response the TODO list
-// @Router /api/todo [get]
+// @Router /api/todos [get]
 // @Accept json
 // @Produce json
 // @Success 200 {array} types.Todo "OK"
-// getAllTodos: The handler to response the TODO list
+// @Success 204 "No Content"
 func getAllTodos(c *gin.Context) {
-	todos := todoService.GetAll()
-	c.IndentedJSON(http.StatusOK, todos)
+	if todos := todoService.GetAll(); todos == nil {
+		c.Writer.WriteHeader(http.StatusNoContent)
+	} else {
+		c.IndentedJSON(http.StatusOK, todos)
+	}
 }
 
-// @Title Get a TODO by its Id
+// @Tags Todo
+// @Title Get the TODO by its Id
 // @Description The handler for getting the TODO by Id
 // @Router /api/todo/{id} [get]
 // @Param id path string true "A TODO's Id."
@@ -131,7 +128,6 @@ func getAllTodos(c *gin.Context) {
 // @Produce json
 // @Success 200 {object} types.Todo "OK"
 // @Success 204 "No Content"
-// getTodo: The handler for getting the TODO by Id
 func getTodo(c *gin.Context) {
 	id := c.Param("id") // Get the value from api/todo/:id
 	uuid, _ := uuid.Parse(id)
@@ -143,6 +139,7 @@ func getTodo(c *gin.Context) {
 	}
 }
 
+// @Tags Todo
 // @Title Search TODOs
 // @Description The handler for searching the TODOs by Title and IsDone
 // @Router /api/todo/search [get]
@@ -151,6 +148,7 @@ func getTodo(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 200 {array} types.Todo "OK"
+// @Success 204 "No Content"
 func searchTodo(c *gin.Context) {
 	queryValTitle := c.Query("title")
 	queryValIsDone, _ := strconv.ParseBool(c.DefaultQuery("isDone", "false"))
@@ -162,6 +160,7 @@ func searchTodo(c *gin.Context) {
 	}
 }
 
+// @Tags User
 // @Title Create a new User
 // @Description The handler to add a new User
 // @Router /api/user [post]
@@ -181,6 +180,7 @@ func postUser(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, newUser)
 }
 
+// @Tags Todo
 // @Title Create a new TODO
 // @Description The handler to add a new TODO
 // @Router /api/todo [post]
@@ -205,6 +205,7 @@ func postTodo(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, newTodo)
 }
 
+// @Tags User
 // @Title Edit a User
 // @Description The handler to edit a User
 // @Router /api/user [put]
@@ -225,6 +226,7 @@ func putUser(c *gin.Context) {
 	}
 }
 
+// @Tags Todo
 // @Title Edit a TODO
 // @Description The handler to edit a TODO
 // @Router /api/todo [put]
@@ -245,6 +247,7 @@ func putTodo(c *gin.Context) {
 	}
 }
 
+// @Tags User
 // @Title Delete a User
 // @Description The handler to delete an exist User from User list
 // @Router /api/user [delete]
@@ -265,6 +268,7 @@ func deleteUser(c *gin.Context) {
 	}
 }
 
+// @Tags Todo
 // @Title Delete a TODO
 // @Description The handler to delete an TODO
 // @Router /api/todo [delete]
@@ -285,9 +289,10 @@ func deleteTodo(c *gin.Context) {
 	}
 }
 
+// @Tags Todos
 // @Title Delete TODOs
-// @Description The handler to delete TODOs
-// @Router /api/todo [delete]
+// @Description The handler to delete TODOs by their Id
+// @Router /api/todos [delete]
 // @Param todo body []types.Todo true "The TODOs to be deleted."
 // @Accept json
 // @Produce json
