@@ -16,6 +16,8 @@ import (
 	"gorm.io/gorm/logger"
 )
 
+const HTTP_HEADER_ROW_COUNT = "X-Row-Count"
+
 var myTodoList []types.Todo
 var userService *userservice.UserAccess
 var todoService *todoservice.TodoAccess
@@ -52,6 +54,7 @@ func main() {
 	router.POST("api/todo", postTodo)
 	router.PUT("api/todo", putTodo)
 	router.DELETE("api/todo", deleteTodo)
+	router.DELETE("api/todos", deleteTodos)
 
 	// Swagger configuration (that will overwrites the General API annotations on main().
 	docs.SwaggerInfo.BasePath = "/"
@@ -252,7 +255,7 @@ func deleteUser(c *gin.Context) {
 }
 
 // @Title Delete a TODO
-// @Description The handler to delete an exist TODO from TODO list
+// @Description The handler to delete an TODO
 // @Router /api/todo [delete]
 // @Param todo body types.Todo true "The TODO to be deleted."
 // @Accept json
@@ -266,7 +269,25 @@ func deleteTodo(c *gin.Context) {
 		c.Writer.WriteHeader(http.StatusBadRequest)
 	}
 
-	if count := todoService.Delete(&deleteTodo); count == 0 {
+	if count := todoService.DeleteOne(&deleteTodo); count == 0 {
 		c.Writer.WriteHeader(http.StatusUnprocessableEntity)
 	}
+}
+
+// @Title Delete TODOs
+// @Description The handler to delete TODOs
+// @Router /api/todo [delete]
+// @Param todo body []types.Todo true "The TODOs to be deleted."
+// @Accept json
+// @Produce json
+// @Success 200 "OK"
+// @Failure 400 "Bad Request"
+func deleteTodos(c *gin.Context) {
+	var deleteTodos []types.Todo
+	if err := c.BindJSON(&deleteTodos); err != nil {
+		c.Writer.WriteHeader(http.StatusBadRequest)
+	}
+
+	count := todoService.Delete(&deleteTodos)
+	c.Header(HTTP_HEADER_ROW_COUNT, strconv.FormatInt(count, 10))
 }

@@ -25,7 +25,7 @@ func New(db *gorm.DB) *TodoAccess {
 	}
 }
 
-// Get: get the todo by Id
+// Get: get the TODO by Id
 func (m *TodoAccess) Get(id uuid.UUID) *types.Todo {
 	var entity *dbtypes.Todo
 	var todo *types.Todo
@@ -63,7 +63,7 @@ func (m *TodoAccess) Search(queryValTitle string, queryValIsDone bool) *[]types.
 	return todos
 }
 
-// Create: create a new todo
+// Create: create a new TODO
 func (m *TodoAccess) Create(todo *types.Todo) *dbtypes.Todo {
 	var entity dbtypes.Todo
 	automapper.MapLoose(todo, &entity)
@@ -82,7 +82,7 @@ func (m *TodoAccess) Create(todo *types.Todo) *dbtypes.Todo {
 	return &entity
 }
 
-// Update: update a todo
+// Update: update the TODO
 func (m *TodoAccess) Update(todo *types.Todo) int64 {
 	var entity dbtypes.Todo
 	var updatedCount int64
@@ -97,6 +97,7 @@ func (m *TodoAccess) Update(todo *types.Todo) int64 {
 		},
 	}
 	m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, todo.Id).Updates(&entity).Count(&updatedCount)
+
 	// Update TodoExt
 	// m.DB.Model(&entity).Association("TodoExt").Append(&entity.TodoExt) // Not work, see https://github.com/go-gorm/gorm/issues/3487
 	// m.DB.Session(&gorm.Session{FullSaveAssociations: true}).Save(&entity) // This will work
@@ -118,8 +119,8 @@ func (m *TodoAccess) Update(todo *types.Todo) int64 {
 	return updatedCount
 }
 
-// Delete: delete a todo
-func (m *TodoAccess) Delete(todo *types.Todo) int64 {
+// DeleteOne: delete a TODO
+func (m *TodoAccess) DeleteOne(todo *types.Todo) int64 {
 	// Optional: If we don't set CASCADE delete, then we can use Association to remove the relations, e.q. relations in todo_tags as following.
 	// var entity dbtypes.Todo
 	// m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, todo.Id).Preload("Tags").First(&entity)
@@ -127,6 +128,23 @@ func (m *TodoAccess) Delete(todo *types.Todo) int64 {
 
 	var count int64
 	m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, todo.Id).Count(&count).Delete(&dbtypes.Todo{})
+
+	return count
+}
+
+// Delete: delete one or more TODOs
+func (m *TodoAccess) Delete(todos *[]types.Todo) int64 {
+	var count int64
+	var entities []dbtypes.Todo
+
+	// Get the Ids
+	todoIds := utils.Map(*todos, func(todo types.Todo) uuid.UUID {
+		return todo.Id
+	})
+
+	// m.DB.Model(&dbtypes.Todo{}).Where()
+	m.DB.Find(&entities, todoIds).Count(&count).Delete(&dbtypes.Todo{})
+	// db.Delete(&types.Todo{}, `"Id" IN ?`, todoIds)
 
 	return count
 }
