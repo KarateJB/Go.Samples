@@ -25,15 +25,32 @@ func New(db *gorm.DB) *TodoAccess {
 	}
 }
 
-// Get: get the TODO by Id
-func (m *TodoAccess) Get(id uuid.UUID) *types.Todo {
+// GetAll: get all TODOs
+func (m *TodoAccess) GetAll() *[]types.Todo {
+	var entities *[]dbtypes.Todo
+	var todos []types.Todo
+	var count int64
+
+	m.DB.Preload(clause.Associations).Preload("TodoExt.Priority").Find(&entities).Count(&count)
+
+	if count > 0 {
+		for _, entity := range *entities {
+			var todo types.Todo
+			automapper.MapLoose(entity, &todo)
+			todos = append(todos, todo)
+		}
+	}
+	return &todos
+}
+
+// GetOne: get the TODO by Id
+func (m *TodoAccess) GetOne(id uuid.UUID) *types.Todo {
 	var entity *dbtypes.Todo
 	var todo *types.Todo
 	var count int64
 
 	m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, id).Preload(clause.Associations).Preload("TodoExt.Priority").First(&entity).Count(&count)
-	// m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, id).Joins("TodoExt").First(&entity).Count(&count)
-	// m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, id).Preload(clause.Associations).First(&entity).Count(&count)
+	// m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, id).Joins("TodoExt").First(&entity).Count(&count) // Or specify the outer join target
 
 	if count > 0 {
 		automapper.MapLoose(entity, &todo)
@@ -44,7 +61,7 @@ func (m *TodoAccess) Get(id uuid.UUID) *types.Todo {
 // Search: search TODOs that its Title contains "queryValTitle" and IsDone matchs "queryValIsDone"
 func (m *TodoAccess) Search(queryValTitle string, queryValIsDone bool) *[]types.Todo {
 	var entities *[]dbtypes.Todo
-	var todos *[]types.Todo
+	var todos []types.Todo
 	var count int64
 
 	m.DB.Model(entities).
@@ -56,11 +73,11 @@ func (m *TodoAccess) Search(queryValTitle string, queryValIsDone bool) *[]types.
 		for _, entity := range *entities {
 			var todo types.Todo
 			automapper.MapLoose(entity, &todo)
-			*todos = append(*todos, todo)
+			todos = append(todos, todo)
 		}
 	}
 
-	return todos
+	return &todos
 }
 
 // Create: create a new TODO

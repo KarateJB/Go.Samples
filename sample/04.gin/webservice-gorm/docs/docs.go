@@ -104,7 +104,7 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "The handler to delete an exist TODO from TODO list",
+                "description": "The handler to delete TODOs",
                 "consumes": [
                     "application/json"
                 ],
@@ -113,12 +113,15 @@ const docTemplate = `{
                 ],
                 "parameters": [
                     {
-                        "description": "The TODO to be deleted.",
+                        "description": "The TODOs to be deleted.",
                         "name": "todo",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/types.Todo"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.Todo"
+                            }
                         }
                     }
                 ],
@@ -128,9 +131,6 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request"
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity"
                     }
                 }
             }

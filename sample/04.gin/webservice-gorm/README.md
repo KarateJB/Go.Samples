@@ -24,7 +24,7 @@ curl -X POST "http://localhost:8001/api/todo" --include --header "Content-Type: 
 
 curl -X DELETE "http://localhost:8001/api/todo" --include --header "Content-Type: application/json" --data '{"id": "a2a25eb2-9bf7-4cb6-b9db-ece05b78e975"}'
 
-curl -X DELETE "http://localhost:8001/api/todos" --include --header "Content-Type: application/json" --data '[{"id": "ba66d9a6-481b-4803-b0e1-1d37f9fce1c9"}, {"id": "cd09be9b-00ec-4750-9e0d-39d6da56dffe"}, {"id":"4a17dbf4-f1ab-4bf7-9d9d-4bdfa311b8a6"}]'
+curl --include -X DELETE "http://localhost:8001/api/todos" --include --header "Content-Type: application/json" --data '[{"id": "26447744-68f5-4bfa-8126-e11637bd1533"}, {"id": "3a9b82ba-8e41-48b5-9e19-da7dfa8bdfe0"}, {"id":"2df9aa8a-d765-479e-83fa-32eead636219"}]'
 
 curl -X PUT "http://localhost:8001/api/todo" --include --header "Content-Type: application/json" \
   --data '{ "id": "a2a25eb2-9bf7-4cb6-b9db-ece05b78e975", "title": "ZZZZ", "isDone": true, "userId": "JB", "todoExt": {"id": "a2a25eb2-9bf7-4cb6-b9db-ece05b78e975", "description": "WWWW", "priorityId": 3}, "tags": [{"id": "6aee5542-3f70-4cbc-ab05-fd020285f021"}] }'

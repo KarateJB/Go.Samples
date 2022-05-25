@@ -41,20 +41,30 @@ func main() {
 	router := gin.Default()
 
 	// User
-	router.GET("api/user/:id", getUser)
-	router.POST("api/user", postUser)
-	router.PUT("api/user", putUser)
-	router.DELETE("api/user", deleteUser)
-
-	// Todo
-	router.GET("api/todo", getTodoList)
-	router.GET("api/todo/:id", getTodo) // The id is required for matching this routing
-	// router.GET("api/todo/*id", getTodoById) // The id is optional for matching this routing, e.q. api/todo/ or api/todo/xxx
-	router.GET("api/todo/search", searchTodo)
-	router.POST("api/todo", postTodo)
-	router.PUT("api/todo", putTodo)
-	router.DELETE("api/todo", deleteTodo)
-	router.DELETE("api/todos", deleteTodos)
+	apiRouterGroup := router.Group("/api")
+	{
+		userRg := apiRouterGroup.Group("/user")
+		{
+			userRg.GET(":id", getUser)
+			userRg.POST("", postUser)
+			userRg.PUT("", putUser)
+			userRg.DELETE("", deleteUser)
+		}
+		todoRg := apiRouterGroup.Group("/todo")
+		{
+			todoRg.GET(":id", getTodo) // The id is required for matching this routing
+			// todoRg.GET("*id", getTodoById) // The id is optional for matching this routing, e.q. api/todo/ or api/todo/xxx
+			todoRg.GET("search", searchTodo)
+			todoRg.POST("", postTodo)
+			todoRg.PUT("", putTodo)
+			todoRg.DELETE("", deleteTodo)
+		}
+		todosRg := apiRouterGroup.Group("/todos")
+		{
+			todosRg.GET("", getAllTodos)
+			todosRg.DELETE("", deleteTodos)
+		}
+	}
 
 	// Swagger configuration (that will overwrites the General API annotations on main().
 	docs.SwaggerInfo.BasePath = "/"
@@ -80,6 +90,7 @@ func main() {
 	router.Run("localhost:8001")
 }
 
+// @Tags User
 // @Title Get a User by its Id
 // @Description The handler for getting the User by Id
 // @Router /api/todo/{id} [get]
@@ -99,17 +110,17 @@ func getUser(c *gin.Context) {
 	}
 }
 
-// @Title Get TODO list
+// @Tags Todos
+// @Title Get all TODOs
 // @Description The handler to response the TODO list
 // @Router /api/todo [get]
 // @Accept json
 // @Produce json
 // @Success 200 {array} types.Todo "OK"
-// getTodoList: The handler to response the TODO list
-func getTodoList(c *gin.Context) {
-
-	// Serialize myTodoList to json and add it to reponse
-	c.IndentedJSON(http.StatusOK, myTodoList)
+// getAllTodos: The handler to response the TODO list
+func getAllTodos(c *gin.Context) {
+	todos := todoService.GetAll()
+	c.IndentedJSON(http.StatusOK, todos)
 }
 
 // @Title Get a TODO by its Id
@@ -125,7 +136,7 @@ func getTodo(c *gin.Context) {
 	id := c.Param("id") // Get the value from api/todo/:id
 	uuid, _ := uuid.Parse(id)
 
-	if todo := todoService.Get(uuid); todo == nil {
+	if todo := todoService.GetOne(uuid); todo == nil {
 		c.Writer.WriteHeader(http.StatusNoContent) // If not found, response 204
 	} else {
 		c.IndentedJSON(http.StatusOK, todo)
