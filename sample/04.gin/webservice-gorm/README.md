@@ -21,7 +21,7 @@ $ curl -X DELETE "http://localhost:8001/api/user" --include --header "Content-Ty
 
 ```s
 // Get the TODO by its Id
-$ curl --include http://localhost:8001/api/todo/a2a25eb2-9bf7-4cb6-b9db-ece05b78e975
+$ curl --include http://localhost:8001/api/todo/d23359d5-2e2f-4e04-84cc-2db7d6e281e3
 
 // Create a TODO
 $ curl -X POST "http://localhost:8001/api/todo" --include --header "Content-Type: application/json" \
@@ -29,11 +29,11 @@ $ curl -X POST "http://localhost:8001/api/todo" --include --header "Content-Type
 
 // Update the TODO
 curl -X PUT "http://localhost:8001/api/todo" --include --header "Content-Type: application/json" \
-  --data '{ "id": "af4f750b-895f-4be0-99c4-38a5fedf642c", "title": "ZZZZ", "isDone": true, "userId": "JB", "todoExt": {"id": "af4f750b-895f-4be0-99c4-38a5fedf642c", "description": "WWWW", "priorityId": 3}, "tags": [{"id": "6aee5542-3f70-4cbc-ab05-fd020285f021"}] }'
+  --data '{ "id": "d23359d5-2e2f-4e04-84cc-2db7d6e281e3", "title": "ZZZZ", "isDone": true, "userId": "JB", "todoExt": {"id": "d23359d5-2e2f-4e04-84cc-2db7d6e281e3", "description": "WWWW", "priorityId": 3}, "tags": [{"id": "6aee5542-3f70-4cbc-ab05-fd020285f021"}] }'
 
 // DELETe the TODO
 $ curl -X DELETE "http://localhost:8001/api/todo" --include --header "Content-Type: application/json" \
-  --data '{"id": "af4f750b-895f-4be0-99c4-38a5fedf642c"}'
+  --data '{"id": "d23359d5-2e2f-4e04-84cc-2db7d6e281e3"}'
 ```
 
 ## api/todos
@@ -43,13 +43,13 @@ $ curl -X DELETE "http://localhost:8001/api/todo" --include --header "Content-Ty
 $ curl --include http://localhost:8001/api/todos
 
 // Search TODOs by Title and IsDone
-$ curl --include "http://localhost:8001/api/todo/search?title=Task%20A"
-$ curl --include "http://localhost:8001/api/todo/search?title=Task&isDone=true"
-$ curl --include "http://localhost:8001/api/todo/search?title=B&isDone=true"
+$ curl --include "http://localhost:8001/api/todos/search?title=Task%20A"
+$ curl --include "http://localhost:8001/api/todos/search?title=Task&isDone=true"
+$ curl --include "http://localhost:8001/api/todos/search?title=B&isDone=true"
 
 // Delete TODOs by their Id
 $ curl --include -X DELETE "http://localhost:8001/api/todos" --include --header "Content-Type: application/json" \
-  --data '[{"id": "26447744-68f5-4bfa-8126-e11637bd1533"}, {"id": "dd7b1e23-542f-4beb-9bb6-96435d8e5305"}]'
+  --data '[{"id": "44c30690-05be-465e-8e19-e4e90abc1c94"}, {"id": "dd7b1e23-542f-4beb-9bb6-96435d8e5305"}]'
 ```
 
 ***

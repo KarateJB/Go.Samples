@@ -1,5 +1,10 @@
 package utils
 
+// Constants
+const (
+	HttpHeaderRowCount = "X-Row-Count"
+)
+
 // Map: map A array to B array
 func Map[S, D any](src []S, f func(S) D) []D {
 	us := make([]D, len(src))

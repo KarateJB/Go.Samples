@@ -18,9 +18,7 @@ type DbAccess struct {
 	Error error
 }
 
-const (
-	LogLevel logger.LogLevel = logger.Info
-)
+const LogLevel logger.LogLevel = logger.Info
 
 // New: create and get the Database access instance
 func New() *DbAccess {
