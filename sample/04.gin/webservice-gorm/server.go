@@ -1,11 +1,13 @@
 package main
 
 import (
+	"example/webservice/config"
 	"example/webservice/docs"
 	dbservice "example/webservice/services/db"
 	todoservice "example/webservice/services/todo"
 	userservice "example/webservice/services/user"
 	types "example/webservice/types/api"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -71,8 +73,11 @@ func main() {
 	// url := swagger.URL("https://petstore.swagger.io/v2/swagger.json") // The url pointing to API definition
 	// router.GET("/swagger/*any", swagger.WrapHandler(swaggerfiles.Handler, url))
 
+	// Get configuration
+	configs := config.Init()
+
 	// DB connect configuration
-	dsn := "host=localhost user=postgres password=1qaz2wsx dbname=postgres port=5432 sslmode=disable TimeZone=UTC"
+	dsn := configs.DB
 	dbService := dbservice.New(dsn, logger.Info)
 	dbService.Migrate()
 	dbService.InitData()
@@ -81,7 +86,7 @@ func main() {
 	userService = userservice.New(dbService.DB)
 	todoService = todoservice.New(dbService.DB)
 
-	router.Run("localhost:8001")
+	router.Run(fmt.Sprintf("localhost:%s", configs.Port))
 }
 
 // @Tags User
