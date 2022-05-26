@@ -17,6 +17,9 @@ func main() {
 
 	// Use Mutex
 	mutexSample()
+
+	// Use Channel
+	channelSample()
 }
 
 func ngSample() {
@@ -32,7 +35,7 @@ func ngSample() {
 
 func mutexSample() {
 	totalThreadSafe := ThreadSafeNumber{Val: 0}
-	ch := make(chan string)
+	blockCh := make(chan string)
 
 	for i := 0; i < 1000; i++ {
 		go func(ch chan string) {
@@ -41,10 +44,34 @@ func mutexSample() {
 			totalThreadSafe.Mux.Unlock()
 
 			ch <- "Done"
-		}(ch)
+		}(blockCh)
 
-		<-ch
+		<-blockCh // receiving value from channel
 	}
 
 	fmt.Println(totalThreadSafe.Val)
+	close(blockCh)
+}
+
+func channelSample() {
+	total := 0
+	blockCh := make(chan string)
+	totalCh := make(chan int, 1)
+	totalCh <- total
+
+	for i := 0; i < 1000; i++ {
+		go func(ch chan string) {
+
+			totalCh <- (<-totalCh) + 1
+
+			ch <- "Done"
+
+		}(blockCh)
+
+		<-blockCh
+	}
+
+	fmt.Println(<-totalCh)
+	close(blockCh)
+	close(totalCh)
 }
