@@ -1,11 +1,11 @@
 package main
 
 import (
+	userapi "example/webservice/api/user"
 	"example/webservice/config"
 	"example/webservice/docs"
 	dbservice "example/webservice/services/db"
 	todoservice "example/webservice/services/todo"
-	userservice "example/webservice/services/user"
 	types "example/webservice/types/api"
 	"fmt"
 	"net/http"
@@ -19,7 +19,6 @@ import (
 
 const HTTP_HEADER_ROW_COUNT = "X-Row-Count"
 
-var userService *userservice.UserAccess
 var todoService *todoservice.TodoAccess
 
 // @Title TODO API
@@ -40,10 +39,10 @@ func main() {
 	{
 		userRg := apiRouterGroup.Group("/user")
 		{
-			userRg.GET(":id", getUser)
-			userRg.POST("", postUser)
-			userRg.PUT("", putUser)
-			userRg.DELETE("", deleteUser)
+			userRg.GET(":id", userapi.GetUser)
+			userRg.POST("", userapi.PostUser)
+			userRg.PUT("", userapi.PutUser)
+			userRg.DELETE("", userapi.DeleteUser)
 		}
 		todoRg := apiRouterGroup.Group("/todo")
 		{
@@ -73,35 +72,15 @@ func main() {
 	// router.GET("/swagger/*any", swagger.WrapHandler(swaggerfiles.Handler, url))
 
 	// DB connect configuration
-	configs := config.Init()
 	dbService := dbservice.New()
 	dbService.Migrate()
 	dbService.InitData()
 
 	// Init services
-	userService = userservice.New(dbService.DB)
 	todoService = todoservice.New(dbService.DB)
 
+	configs := config.Init()
 	router.Run(fmt.Sprintf("localhost:%s", configs.Port))
-}
-
-// @Tags User
-// @Title Get the User by Id
-// @Description The handler for getting the User by Id
-// @Router /api/user/{id} [get]
-// @Param id path string true "The User's Id."
-// @Accept json
-// @Produce json
-// @Success 200 {object} types.User "OK"
-// @Success 204 "No Content"
-func getUser(c *gin.Context) {
-	id := c.Param("id") // Get the value from api/user/:id
-
-	if user := userService.Get(id); user == nil {
-		c.Writer.WriteHeader(http.StatusNoContent) // If not found, response 204
-	} else {
-		c.IndentedJSON(http.StatusOK, user)
-	}
 }
 
 // @Tags Todos
@@ -161,26 +140,6 @@ func searchTodo(c *gin.Context) {
 	}
 }
 
-// @Tags User
-// @Title Create a new User
-// @Description The handler to add a new User
-// @Router /api/user [post]
-// @Param user body types.User true "The new User to be created."
-// @Accept json
-// @Produce json
-// @Success 201 {object} types.User
-// @Failure 400 "Bad Request"
-func postUser(c *gin.Context) {
-	var newUser types.User
-	if err := c.BindJSON(&newUser); err != nil {
-		// return
-		c.Writer.WriteHeader(http.StatusBadRequest)
-	}
-
-	userService.Create(&newUser)
-	c.IndentedJSON(http.StatusCreated, newUser)
-}
-
 // @Tags Todo
 // @Title Create a new TODO
 // @Description The handler to add a new TODO
@@ -206,27 +165,6 @@ func postTodo(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, newTodo)
 }
 
-// @Tags User
-// @Title Edit a User
-// @Description The handler to edit a User
-// @Router /api/user [put]
-// @Param user body types.Todo true "The User to be edited."
-// @Accept json
-// @Produce json
-// @Success 200 "OK"
-// @Failure 400 "Bad Request"
-// @Failure 422 "Unprocessable Entity"
-func putUser(c *gin.Context) {
-	var editUser types.User
-	if err := c.BindJSON(&editUser); err != nil {
-		c.Writer.WriteHeader(http.StatusBadRequest)
-	}
-
-	if count := userService.Update(&editUser); count == 0 {
-		c.Writer.WriteHeader(http.StatusUnprocessableEntity)
-	}
-}
-
 // @Tags Todo
 // @Title Edit a TODO
 // @Description The handler to edit a TODO
@@ -244,27 +182,6 @@ func putTodo(c *gin.Context) {
 	}
 
 	if count := todoService.Update(&editTodo); count == 0 {
-		c.Writer.WriteHeader(http.StatusUnprocessableEntity)
-	}
-}
-
-// @Tags User
-// @Title Delete a User
-// @Description The handler to delete an exist User from User list
-// @Router /api/user [delete]
-// @Param todo body types.Todo true "The User to be deleted."
-// @Accept json
-// @Produce json
-// @Success 200 "OK"
-// @Failure 400 "Bad Request"
-// @Failure 422 "Unprocessable Entity"
-func deleteUser(c *gin.Context) {
-	var deleteUser types.User
-	if err := c.BindJSON(&deleteUser); err != nil {
-		c.Writer.WriteHeader(http.StatusBadRequest)
-	}
-
-	if count := userService.Delete(&deleteUser); count == 0 {
 		c.Writer.WriteHeader(http.StatusUnprocessableEntity)
 	}
 }
