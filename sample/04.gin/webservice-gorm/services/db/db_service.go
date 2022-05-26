@@ -1,6 +1,7 @@
 package dbservice
 
 import (
+	config "example/webservice/config"
 	dbtypes "example/webservice/types/db"
 	"log"
 	"strconv"
@@ -17,9 +18,17 @@ type DbAccess struct {
 	Error error
 }
 
+const (
+	LogLevel logger.LogLevel = logger.Info
+)
+
 // New: create and get the Database access instance
-func New(dsn string, logLevel logger.LogLevel) *DbAccess {
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: logger.Default.LogMode(logLevel)})
+func New() *DbAccess {
+	// Get configuration
+	configs := config.Init()
+
+	dsn := configs.DB
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: logger.Default.LogMode(LogLevel)})
 	if err != nil {
 		log.Fatal("Failed to connect database")
 	}

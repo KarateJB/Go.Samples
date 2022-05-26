@@ -15,7 +15,6 @@ import (
 	"github.com/google/uuid"
 	swagger "github.com/swaggo/gin-swagger"
 	swaggerfiles "github.com/swaggo/gin-swagger/swaggerFiles"
-	"gorm.io/gorm/logger"
 )
 
 const HTTP_HEADER_ROW_COUNT = "X-Row-Count"
@@ -73,12 +72,9 @@ func main() {
 	// url := swagger.URL("https://petstore.swagger.io/v2/swagger.json") // The url pointing to API definition
 	// router.GET("/swagger/*any", swagger.WrapHandler(swaggerfiles.Handler, url))
 
-	// Get configuration
-	configs := config.Init()
-
 	// DB connect configuration
-	dsn := configs.DB
-	dbService := dbservice.New(dsn, logger.Info)
+	configs := config.Init()
+	dbService := dbservice.New()
 	dbService.Migrate()
 	dbService.InitData()
 
