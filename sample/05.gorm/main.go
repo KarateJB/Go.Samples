@@ -37,7 +37,7 @@ func main() {
 
 	// Demo on CRUD
 	// handleSingleRow() // Single row handling
-	// handleMultipleRows()	// Multiple rows handling
+	// handleMultipleRows() // Multiple rows handling
 }
 
 // initData: Initialize data
