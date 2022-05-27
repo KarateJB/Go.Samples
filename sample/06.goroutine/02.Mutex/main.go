@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"sync"
+	"time"
 )
 
 // ThreadSafeNumber
@@ -18,8 +19,11 @@ func main() {
 	// Use Mutex
 	mutexSample()
 
-	// Use Channel
-	channelSample()
+	// Use unbuffered channel
+	unbufChannelSample()
+
+	// Use buffered Channel
+	bufChannelSample()
 }
 
 func ngSample() {
@@ -35,28 +39,38 @@ func ngSample() {
 
 func mutexSample() {
 	totalThreadSafe := ThreadSafeNumber{Val: 0}
-	blockCh := make(chan string)
 
 	for i := 0; i < 1000; i++ {
-		go func(ch chan string) {
+		go func() {
 			totalThreadSafe.Mux.Lock()
 			totalThreadSafe.Val++
 			totalThreadSafe.Mux.Unlock()
-
-			ch <- "Done"
-		}(blockCh)
-
-		<-blockCh // receiving value from channel
+		}()
 	}
 
+	time.Sleep(1000 * time.Millisecond) // This block main goroutine to print the value of "totalSafe"
 	fmt.Println(totalThreadSafe.Val)
-	close(blockCh)
 }
 
-func channelSample() {
+func unbufChannelSample() {
+	totalNonThreadSafe := 0
+	blockCh := make(chan string)
+	for i := 0; i < 1000; i++ {
+		go func(ch chan string) {
+			totalNonThreadSafe++
+			blockCh <- "Done"
+		}(blockCh)
+
+		<-blockCh
+	}
+
+	fmt.Println(totalNonThreadSafe)
+}
+
+func bufChannelSample() {
 	total := 0
 	blockCh := make(chan string)
-	totalCh := make(chan int, 1)
+	totalCh := make(chan int, 1) //Channel as int type and size is 1
 	totalCh <- total
 
 	for i := 0; i < 1000; i++ {
