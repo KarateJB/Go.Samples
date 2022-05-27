@@ -53,39 +53,33 @@ func mutexSample() {
 }
 
 func unbufChannelSample() {
-	totalNonThreadSafe := 0
+	total := 0
 	blockCh := make(chan string)
 	for i := 0; i < 1000; i++ {
 		go func(ch chan string) {
-			totalNonThreadSafe++
+			total++
 			blockCh <- "Done"
 		}(blockCh)
 
-		<-blockCh
+		<-blockCh // Block each run in for loop until the goroutine in each run pushs
 	}
 
-	fmt.Println(totalNonThreadSafe)
+	fmt.Println(total)
 }
 
 func bufChannelSample() {
 	total := 0
-	blockCh := make(chan string)
 	totalCh := make(chan int, 1) //Channel as int type and size is 1
 	totalCh <- total
 
 	for i := 0; i < 1000; i++ {
-		go func(ch chan string) {
+		go func() {
 
 			totalCh <- (<-totalCh) + 1
-
-			ch <- "Done"
-
-		}(blockCh)
-
-		<-blockCh
+		}()
 	}
 
+	time.Sleep(1000 * time.Millisecond) // This block main goroutine to print the value of "totalSafe"
 	fmt.Println(<-totalCh)
-	close(blockCh)
 	close(totalCh)
 }
