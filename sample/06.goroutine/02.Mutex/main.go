@@ -27,29 +27,29 @@ func main() {
 }
 
 func ngSample() {
-	totalNonThreadSafe := 0
+	total := 0 // This is unthreadsafe variable
 	for i := 0; i < 1000; i++ {
 		go func() {
-			totalNonThreadSafe++
+			total++
 		}()
 	}
 
-	fmt.Println(totalNonThreadSafe)
+	fmt.Println(total)
 }
 
 func mutexSample() {
-	totalThreadSafe := ThreadSafeNumber{Val: 0}
+	total := ThreadSafeNumber{Val: 0}
 
 	for i := 0; i < 1000; i++ {
 		go func() {
-			totalThreadSafe.Mux.Lock()
-			totalThreadSafe.Val++
-			totalThreadSafe.Mux.Unlock()
+			total.Mux.Lock()
+			total.Val++
+			total.Mux.Unlock()
 		}()
 	}
 
 	time.Sleep(1000 * time.Millisecond) // This block main goroutine to print the value of "totalSafe"
-	fmt.Println(totalThreadSafe.Val)
+	fmt.Println(total.Val)
 }
 
 func unbufChannelSample() {
@@ -61,7 +61,7 @@ func unbufChannelSample() {
 			blockCh <- "Done"
 		}(blockCh)
 
-		<-blockCh // Block each run in for loop until the goroutine in each run pushs
+		<-blockCh // Block each run in for loop until the goroutine in each run send "Done"
 	}
 
 	fmt.Println(total)
@@ -75,11 +75,11 @@ func bufChannelSample() {
 	for i := 0; i < 1000; i++ {
 		go func() {
 
-			totalCh <- (<-totalCh) + 1
+			totalCh <- (<-totalCh + 1)
 		}()
 	}
 
-	time.Sleep(1000 * time.Millisecond) // This block main goroutine to print the value of "totalSafe"
+	time.Sleep(1000 * time.Millisecond) // Blocks main goroutine to print after all goroutines are all done
 	fmt.Println(<-totalCh)
 	close(totalCh)
 }

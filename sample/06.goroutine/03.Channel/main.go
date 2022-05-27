@@ -12,16 +12,16 @@ func main() {
 
 	time.Sleep(2 * time.Second)
 
-	// for v := range ch {
-	// 	fmt.Println("Read value", v, "from channel")
-	// 	time.Sleep(2 * time.Second)
-	// }
+	for v := range ch {
+		fmt.Println("Read value", v, "from channel")
+		time.Sleep(2 * time.Second)
+	}
 
 	// Or iterate channel like this
 	// LOOP1:
 	// 	for {
-	// 		v, ok := <-ch
-	// 		if ok {
+
+	// 		if v, ok := <-ch; ok {
 	// 			fmt.Println("Read value", v, "from channel")
 	// 			time.Sleep(2 * time.Second)
 	// 		} else {
@@ -29,29 +29,29 @@ func main() {
 	// 		}
 	// 	}
 
-LOOP2:
-	for {
-		select {
-		case v, ok := <-ch:
-			if ok {
-				fmt.Println("Read value", v, "from channel")
-				time.Sleep(2 * time.Second)
-			} else {
-				break LOOP2
-			}
-		default:
-			fmt.Println("Channel blocking...")
-			// Do something...
-		}
-	}
+	// LOOP2:
+	// 	for {
+	// 		select {
+	// 		case v, ok := <-ch:
+	// 			if ok {
+	// 				fmt.Println("Read value", v, "from channel")
+	// 				time.Sleep(2 * time.Second)
+	// 			} else {
+	// 				break LOOP2
+	// 			}
+	// 		default:
+	// 			fmt.Println("Channel blocking...") // This won't happen cus we break the loop when the channel is closed.
+	// 		}
+	// 	}
 }
 
 func write(ch chan int) {
 
-	for i := 1; i <= 4; i++ {
+	for i := 1; i <= 6; i++ {
 		time.Sleep(2 * time.Second)
 		ch <- i
 		fmt.Println("Successfully wrote", i, "to channel")
 	}
+
 	close(ch)
 }

@@ -7,6 +7,9 @@ import (
 )
 
 func main() {
+	// New goroutine
+	// goroutineSample()
+
 	// NG
 	// ngSample()
 
@@ -19,7 +22,7 @@ func main() {
 
 // Output: show message
 func output(s string, delay int) {
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 3; i++ {
 		time.Sleep(time.Duration(delay) * time.Millisecond)
 		fmt.Println(s)
 	}
@@ -31,20 +34,28 @@ func outputByWg(s string, delay int, wg *sync.WaitGroup) {
 		defer wg.Done() // decrease counter by 1, once counter eauals 0, WaitGroup stop blocking.
 	}
 
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 3; i++ {
 		time.Sleep(time.Duration(delay) * time.Millisecond)
 		fmt.Println(s)
 	}
 }
 
 // outputByChannel: show message but use channel to block
-func outputByChannel(s string, delay int, ch chan string) {
-	for i := 0; i < 5; i++ {
-		time.Sleep(time.Duration(delay) * time.Millisecond)
+func outputByChannel(s string, ch chan string) {
+	for i := 0; i < 3; i++ {
 		fmt.Println(s)
+		time.Sleep(1000 * time.Millisecond)
 	}
 
 	ch <- "Done"
+}
+
+func goroutineSample() {
+	go func() { fmt.Print(" Hello ") }()
+	fmt.Print(" World ")
+	time.Sleep(time.Second)
+
+	// output: World Hello
 }
 
 func ngSample() {
@@ -69,11 +80,10 @@ func waitGroupSample() {
 func channelSample() {
 	ch := make(chan string)
 
-	go outputByChannel("goroutine 1", 100, ch)
-	go outputByChannel("goroutine 2", 300, ch)
-	output("goroutine main", 200)
+	go outputByChannel("goroutine 1", ch)
+	go outputByChannel("goroutine 2", ch)
+	// output("goroutine main", 200)
 
-	// Wait until there are two "Done" pushed to the channel
 	<-ch
 	<-ch
 }
