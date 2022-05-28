@@ -40,8 +40,10 @@ LOOP2:
 			} else {
 				break LOOP2
 			}
-		default:
-			fmt.Println("Channel blocking...") // This won't happen cus we break the loop when the channel is closed.
+		case <-time.After(1 * time.Second):
+			fmt.Println("Timout...")
+			// default:
+			// 	fmt.Println("Channel blocking...") // This won't happen cus we break the loop when the channel is closed.
 		}
 
 		time.Sleep(2 * time.Second)
@@ -56,5 +58,5 @@ func write(ch chan int) {
 		fmt.Println("Successfully wrote", i, "to channel")
 	}
 
-	close(ch) // Comment out this line to test the default case in "3. for + select"
+	close(ch) // Comment out this line to test the default or timeout cases in "3. for + select"
 }
