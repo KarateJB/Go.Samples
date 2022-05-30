@@ -29,6 +29,16 @@ func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 	return r.todos, nil
 }
 
+func (r *queryResolver) Todo(ctx context.Context, id string) (*model.Todo, error) {
+	for _, todo := range r.todos {
+		if todo.ID == id {
+			return todo, nil
+		}
+	}
+
+	return nil, nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 

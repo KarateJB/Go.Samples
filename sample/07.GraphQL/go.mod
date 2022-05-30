@@ -8,6 +8,8 @@ require (
 )
 
 require (
+	// github.com/99designs/gqlgen/internal/imports v0.17.9
+	// github.com/99designs/gqlgen/codegen/config v0.17.9
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
