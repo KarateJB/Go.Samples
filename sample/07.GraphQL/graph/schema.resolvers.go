@@ -39,11 +39,22 @@ func (r *queryResolver) Todo(ctx context.Context, id string) (*model.Todo, error
 	return nil, nil
 }
 
+func (r *todoResolver) User(ctx context.Context, obj *model.Todo) (*model.User, error) {
+	return &model.User{
+		ID:   obj.User.ID,
+		Name: obj.User.Name,
+	}, nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
+// Todo returns generated.TodoResolver implementation.
+func (r *Resolver) Todo() generated.TodoResolver { return &todoResolver{r} }
+
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type todoResolver struct{ *Resolver }
