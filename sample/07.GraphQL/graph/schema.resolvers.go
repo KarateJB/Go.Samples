@@ -8,15 +8,17 @@ import (
 	"example/graphql/graph/generated"
 	"example/graphql/graph/model"
 	"fmt"
-	"math/rand"
+
+	"github.com/google/uuid"
 )
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
 	todo := &model.Todo{
-		Text: input.Text,
-		ID:   fmt.Sprintf("T%d", rand.Int()),
+		Id:     uuid.New(),
+		Title:  input.Title,
+		IsDone: input.IsDone,
 		User: &model.User{
-			ID:   input.UserID,
+			Id:   input.UserID,
 			Name: fmt.Sprintf("user%s", input.UserID),
 		},
 	}
@@ -31,7 +33,7 @@ func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 
 func (r *queryResolver) Todo(ctx context.Context, id string) (*model.Todo, error) {
 	for _, todo := range r.todos {
-		if todo.ID == id {
+		if todo.Id.String() == id {
 			return todo, nil
 		}
 	}
@@ -41,7 +43,7 @@ func (r *queryResolver) Todo(ctx context.Context, id string) (*model.Todo, error
 
 func (r *todoResolver) User(ctx context.Context, obj *model.Todo) (*model.User, error) {
 	return &model.User{
-		ID:   obj.User.ID,
+		Id:   obj.User.Id,
 		Name: obj.User.Name,
 	}, nil
 }
@@ -58,3 +60,13 @@ func (r *Resolver) Todo() generated.TodoResolver { return &todoResolver{r} }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type todoResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *todoResolver) ID(ctx context.Context, obj *model.Todo) (model.UUID, error) {
+	panic(fmt.Errorf("not implemented"))
+}

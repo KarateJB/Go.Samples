@@ -1,11 +1,12 @@
 # GraphQL schema example
 #
 # https://gqlgen.com/getting-started/
+scalar UUID
 
 type Todo {
-  id: ID!
-  text: String!
-  done: Boolean!
+  id: UUID!
+  title: String!
+  isDone: Boolean!
   user: User!
 }
 
@@ -20,7 +21,8 @@ type Query {
 }
 
 input NewTodo {
-  text: String!
+  title: String!
+  isDone: Boolean
   userId: String!
 }
 
