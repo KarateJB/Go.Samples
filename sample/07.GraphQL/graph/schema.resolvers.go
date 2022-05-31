@@ -13,6 +13,7 @@ import (
 	"github.com/stroiman/go-automapper"
 )
 
+// CreateUser: create a new user
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
 	var user *model.User
 	automapper.MapLoose(input, &user)
@@ -20,16 +21,8 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 	return user, nil
 }
 
+// CreateTodo: create a new TODO
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	// var user *model.User
-	// if input.UserId != "" {
-	// 	for _, u := range r.users {
-	// 		if u.Id == input.UserId {
-	// 			user = u
-	// 			break
-	// 		}
-	// 	}
-	// }
 
 	todo := &model.Todo{
 		Id:     uuid.New(),
@@ -42,6 +35,7 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 	return todo, nil
 }
 
+// UpdateUser: update a user
 func (r *mutationResolver) UpdateUser(ctx context.Context, input model.EditUser) (*model.User, error) {
 	for index, user := range r.users {
 		if user.Id == input.Id {
@@ -53,6 +47,7 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, input model.EditUser)
 	return nil, nil
 }
 
+// UpdateTodo: update a TOOD except for its owner(user)
 func (r *mutationResolver) UpdateTodo(ctx context.Context, input model.EditTodo) (*model.Todo, error) {
 	for index, todo := range r.todos {
 		if todo.Id == input.Id {
@@ -64,6 +59,7 @@ func (r *mutationResolver) UpdateTodo(ctx context.Context, input model.EditTodo)
 	return nil, nil
 }
 
+// Todo: find the TODO by Id
 func (r *queryResolver) Todo(ctx context.Context, id string) (*model.Todo, error) {
 	for _, todo := range r.todos {
 		if todo.Id.String() == id {
@@ -74,10 +70,12 @@ func (r *queryResolver) Todo(ctx context.Context, id string) (*model.Todo, error
 	return nil, nil
 }
 
+// Todos: get all TODOs
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 	return r.todos, nil
 }
 
+// User: finds the user by Id
 func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
 	for _, user := range r.users {
 		if user.Id == id {
@@ -88,10 +86,12 @@ func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error
 	return nil, nil
 }
 
+// Users: get all users
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
+// User: get the user of a TODO
 func (r *todoResolver) User(ctx context.Context, obj *model.Todo) (*model.User, error) {
 	for _, user := range r.users {
 		if user.Id == obj.UserId {
