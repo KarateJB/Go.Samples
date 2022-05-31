@@ -34,7 +34,21 @@ input NewUser {
   name: String!
 }
 
+input EditTodo {
+  id: UUID!
+  title: String!
+  isDone: Boolean
+  # userId: String!
+}
+
+input EditUser {
+  id: ID!
+  name: String!
+}
+
 type Mutation {
   createUser(input: NewUser!): User!
   createTodo(input: NewTodo!): Todo!
+  updateUser(input: EditUser!): User!
+  updateTodo(input: EditTodo!): Todo!
 }

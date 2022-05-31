@@ -42,6 +42,28 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 	return todo, nil
 }
 
+func (r *mutationResolver) UpdateUser(ctx context.Context, input model.EditUser) (*model.User, error) {
+	for index, user := range r.users {
+		if user.Id == input.Id {
+			r.users[index].Name = input.Name
+			return r.users[index], nil
+		}
+	}
+
+	return nil, nil
+}
+
+func (r *mutationResolver) UpdateTodo(ctx context.Context, input model.EditTodo) (*model.Todo, error) {
+	for index, todo := range r.todos {
+		if todo.Id == input.Id {
+			r.todos[index].Title, r.todos[index].IsDone = input.Title, input.IsDone
+			return r.todos[index], nil
+		}
+	}
+
+	return nil, nil
+}
+
 func (r *queryResolver) Todo(ctx context.Context, id string) (*model.Todo, error) {
 	for _, todo := range r.todos {
 		if todo.Id.String() == id {

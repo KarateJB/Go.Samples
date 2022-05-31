@@ -9,3 +9,8 @@ type NewUser struct {
 	Id   string `json:"id"`
 	Name string `json:"name"`
 }
+
+type EditUser struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+}
