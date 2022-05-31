@@ -10,25 +10,36 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/stroiman/go-automapper"
 )
 
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
+	var user *model.User
+	automapper.MapLoose(input, &user)
+	r.users = append(r.users, user)
+	return user, nil
+}
+
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
+	// var user *model.User
+	// if input.UserId != "" {
+	// 	for _, u := range r.users {
+	// 		if u.Id == input.UserId {
+	// 			user = u
+	// 			break
+	// 		}
+	// 	}
+	// }
+
 	todo := &model.Todo{
 		Id:     uuid.New(),
 		Title:  input.Title,
 		IsDone: input.IsDone,
-		User: &model.User{
-			Id:   input.UserID,
-			Name: fmt.Sprintf("user%s", input.UserID),
-		},
+		UserId: input.UserId,
 	}
 
 	r.todos = append(r.todos, todo)
 	return todo, nil
-}
-
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	return r.todos, nil
 }
 
 func (r *queryResolver) Todo(ctx context.Context, id string) (*model.Todo, error) {
@@ -41,11 +52,32 @@ func (r *queryResolver) Todo(ctx context.Context, id string) (*model.Todo, error
 	return nil, nil
 }
 
+func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
+	return r.todos, nil
+}
+
+func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
+	for _, user := range r.users {
+		if user.Id == id {
+			return user, nil
+		}
+	}
+
+	return nil, nil
+}
+
+func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *todoResolver) User(ctx context.Context, obj *model.Todo) (*model.User, error) {
-	return &model.User{
-		Id:   obj.User.Id,
-		Name: obj.User.Name,
-	}, nil
+	for _, user := range r.users {
+		if user.Id == obj.UserId {
+			return user, nil
+		}
+	}
+
+	return nil, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
@@ -60,13 +92,3 @@ func (r *Resolver) Todo() generated.TodoResolver { return &todoResolver{r} }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type todoResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *todoResolver) ID(ctx context.Context, obj *model.Todo) (model.UUID, error) {
-	panic(fmt.Errorf("not implemented"))
-}

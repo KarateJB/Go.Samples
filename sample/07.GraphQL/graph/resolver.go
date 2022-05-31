@@ -11,4 +11,6 @@ import "example/graphql/graph/model"
 type Resolver struct {
 	todo  *model.Todo
 	todos []*model.Todo
+	user  *model.User
+	users []*model.User
 }

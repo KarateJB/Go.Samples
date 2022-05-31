@@ -6,6 +6,7 @@ require (
 	github.com/99designs/gqlgen v0.17.9
 	github.com/google/uuid v1.3.0
 	github.com/spf13/viper v1.12.0
+	github.com/stroiman/go-automapper v0.0.0-20200419053654-7c63d5bb0eb4
 	github.com/vektah/gqlparser/v2 v2.4.4
 )
 
