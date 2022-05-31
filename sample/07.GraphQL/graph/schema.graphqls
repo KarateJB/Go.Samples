@@ -51,4 +51,6 @@ type Mutation {
   createTodo(input: NewTodo!): Todo!
   updateUser(input: EditUser!): User!
   updateTodo(input: EditTodo!): Todo!
+  deleteUser(id: ID!): Boolean!
+  deleteTodo(id: UUID!): Boolean!
 }
