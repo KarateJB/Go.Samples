@@ -49,9 +49,9 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32
-  UUID:
-    model:
-      - example/graphql/graph/model.UUID
+  # UUID:
+  #   model:
+  #     - example/graphql/graph/model.UUID
   Int:
     model:
       - github.com/99designs/gqlgen/graphql.Int
