@@ -5,7 +5,9 @@ sample<br />
 ├── 02.CreateModule<br />
 ├── 03.net-http<br />
 ├── 04.gin<br />
-└── 04.gorm
+├── 05.gorm<br />
+├── 06.goroutine<br />
+└── 07.GraphQL
 
 
 # References
