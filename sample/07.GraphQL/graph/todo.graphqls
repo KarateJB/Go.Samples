@@ -1,0 +1,22 @@
+scalar UUID
+
+type Todo {
+  id: UUID!
+  title: String!
+  isDone: Boolean!
+  userId: String
+  user: User
+}
+
+input NewTodo {
+  title: String!
+  isDone: Boolean
+  userId: String!
+}
+
+input EditTodo {
+  id: UUID!
+  title: String!
+  isDone: Boolean
+  # userId: String!
+}
