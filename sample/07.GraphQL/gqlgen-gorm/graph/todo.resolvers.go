@@ -7,7 +7,12 @@ import (
 	"context"
 	"example/graphql/graph/generated"
 	"example/graphql/graph/model"
+	"fmt"
 )
+
+func (r *todoResolver) TodoExt(ctx context.Context, obj *model.Todo) (*model.TodoExt, error) {
+	panic(fmt.Errorf("not implemented"))
+}
 
 func (r *todoResolver) User(ctx context.Context, obj *model.Todo) (*model.User, error) {
 	for _, user := range r.users {
@@ -17,6 +22,10 @@ func (r *todoResolver) User(ctx context.Context, obj *model.Todo) (*model.User, 
 	}
 
 	return nil, nil
+}
+
+func (r *todoResolver) Tags(ctx context.Context, obj *model.Todo) ([]*model.Tag, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 // Todo returns generated.TodoResolver implementation.

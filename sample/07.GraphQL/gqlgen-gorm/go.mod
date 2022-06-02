@@ -9,6 +9,8 @@ require (
 	github.com/stroiman/go-automapper v0.0.0-20200419053654-7c63d5bb0eb4
 	github.com/vektah/gqlparser/v2 v2.4.4
 	golang.org/x/exp v0.0.0-20220518171630-0b5c67f07fdf
+	gorm.io/driver/postgres v1.3.7
+	gorm.io/gorm v1.23.5
 )
 
 require (
@@ -38,8 +40,6 @@ require (
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0 // indirect
-	gorm.io/driver/postgres v1.3.7 // indirect
-	gorm.io/gorm v1.23.5 // indirect
 )
 
 require (

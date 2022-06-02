@@ -59,5 +59,9 @@ models:
       - github.com/99designs/gqlgen/graphql.Int32
   Todo:
     fields:
+      todoExt:
+        resolver: true
       user:
+        resolver: true
+      tags:
         resolver: true

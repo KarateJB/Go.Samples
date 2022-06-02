@@ -7,6 +7,7 @@ import (
 	"context"
 	"example/graphql/graph/generated"
 	"example/graphql/graph/model"
+	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/stroiman/go-automapper"
@@ -76,6 +77,10 @@ func (r *mutationResolver) DeleteTodo(ctx context.Context, id uuid.UUID) (bool, 
 	}
 
 	return !deleteOk, nil
+}
+
+func (r *mutationResolver) DeleteTodos(ctx context.Context, input []uuid.UUID) (*int, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) Todo(ctx context.Context, id string) (*model.Todo, error) {
