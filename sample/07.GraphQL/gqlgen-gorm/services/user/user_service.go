@@ -1,7 +1,7 @@
 package userservice
 
 import (
-	types "example/graphql/graph/model"
+	models "example/graphql/graph/model"
 	dbtypes "example/graphql/types/db"
 
 	"github.com/stroiman/go-automapper"
@@ -20,9 +20,9 @@ func New(db *gorm.DB) *UserAccess {
 }
 
 // Get: get the user by Id
-func (m *UserAccess) Get(id string) *types.User {
+func (m *UserAccess) GetOne(id string) *models.User {
 	var entity *dbtypes.User
-	var user *types.User
+	var user *models.User
 	var count int64
 	m.DB.First(&entity, `"Id" = ?`, id).Count(&count)
 	// m.DB.Model(&dbtypes.User{}).Where(`"Id" = ?`, id).First(&entity)
@@ -32,26 +32,52 @@ func (m *UserAccess) Get(id string) *types.User {
 	return user
 }
 
+// GetAll: get all users
+func (m *UserAccess) GetAll() []*models.User {
+	var entities []dbtypes.User
+	var users []*models.User
+	var count int64
+
+	m.DB.Find(&entities).Count(&count)
+
+	if count > 0 {
+		for _, entity := range entities {
+			var user *models.User
+			automapper.MapLoose(entity, &user)
+			users = append(users, user)
+		}
+		return users
+	} else {
+		return nil
+	}
+}
+
 // Create: create a new user
-func (m *UserAccess) Create(user *types.User) {
+func (m *UserAccess) Create(user *models.NewUser) *models.User {
 	var entity dbtypes.User
+	var createdUser *models.User
 	automapper.MapLoose(user, &entity)
 	m.DB.Create(&entity)
+
+	automapper.MapLoose(entity, &createdUser)
+	return createdUser
 }
 
 // Update: update a user
-func (m *UserAccess) Update(user *types.User) int64 {
-	var updatedCount int64
-	m.DB.Model(&dbtypes.User{}).Where(`"Id" = ?`, user.Id).Updates(dbtypes.User{
+func (m *UserAccess) Update(user *models.EditUser) *models.User {
+	var entity *dbtypes.User
+	var updatedUser *models.User
+	m.DB.Model(&dbtypes.User{}).Where(`"Id" = ?`, user.Id).First(&entity).Updates(dbtypes.User{
 		Name: user.Name,
-	}).Count(&updatedCount)
+	})
 
-	return updatedCount
+	automapper.MapLoose(entity, &updatedUser)
+	return updatedUser
 }
 
 // Delete: delete a user
-func (m *UserAccess) Delete(user *types.User) int64 {
+func (m *UserAccess) Delete(id string) int64 {
 	var count int64
-	m.DB.Model(&dbtypes.User{}).Where(`"Id" = ?`, user.Id).Count(&count).Delete(&dbtypes.User{})
+	m.DB.Model(&dbtypes.User{}).Where(`"Id" = ?`, id).Count(&count).Delete(&dbtypes.User{})
 	return count
 }

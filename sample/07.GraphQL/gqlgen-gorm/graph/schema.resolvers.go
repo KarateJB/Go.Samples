@@ -7,18 +7,19 @@ import (
 	"context"
 	"example/graphql/graph/generated"
 	"example/graphql/graph/model"
+	dbservice "example/graphql/services/db"
+	userservice "example/graphql/services/user"
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/stroiman/go-automapper"
 	"golang.org/x/exp/slices"
 )
 
+var userService *userservice.UserAccess = userservice.New((dbservice.New()).DB)
+
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
-	var user *model.User
-	automapper.MapLoose(input, &user)
-	r.users = append(r.users, user)
-	return user, nil
+	createduser := userService.Create(&input)
+	return createduser, nil
 }
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
@@ -34,14 +35,8 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 }
 
 func (r *mutationResolver) UpdateUser(ctx context.Context, input model.EditUser) (*model.User, error) {
-	for index, user := range r.users {
-		if user.Id == input.Id {
-			r.users[index].Name = input.Name
-			return r.users[index], nil
-		}
-	}
-
-	return nil, nil
+	updatedUser := userService.Update(&input)
+	return updatedUser, nil
 }
 
 func (r *mutationResolver) UpdateTodo(ctx context.Context, input model.EditTodo) (*model.Todo, error) {
@@ -57,14 +52,11 @@ func (r *mutationResolver) UpdateTodo(ctx context.Context, input model.EditTodo)
 
 func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (bool, error) {
 	const deleteOk = true
-	for index, user := range r.users {
-		if user.Id == id {
-			r.users = slices.Delete(r.users, index, index+1)
-			return deleteOk, nil
-		}
+	if cnt := userService.Delete(id); cnt == 1 {
+		return deleteOk, nil
+	} else {
+		return !deleteOk, fmt.Errorf("User (Id: %s) not found", id)
 	}
-
-	return !deleteOk, nil
 }
 
 func (r *mutationResolver) DeleteTodo(ctx context.Context, id uuid.UUID) (bool, error) {
@@ -98,17 +90,13 @@ func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 }
 
 func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
-	for _, user := range r.users {
-		if user.Id == id {
-			return user, nil
-		}
-	}
-
-	return nil, nil
+	user := userService.GetOne(id)
+	return user, nil
 }
 
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
-	return r.users, nil
+	users := userService.GetAll()
+	return users, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
