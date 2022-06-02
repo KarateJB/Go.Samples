@@ -4,6 +4,7 @@ import (
 	"example/graphql/config"
 	"example/graphql/graph"
 	"example/graphql/graph/generated"
+	dbservice "example/graphql/services/db"
 	"log"
 	"net/http"
 
@@ -13,6 +14,10 @@ import (
 
 func main() {
 
+	/* Database */
+	initDb()
+
+	/* GraphQL */
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
@@ -23,4 +28,12 @@ func main() {
 	port := configs.Port
 	log.Printf("Go to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe("localhost:"+port, nil))
+}
+
+// initDb: Initialize database
+func initDb() {
+	// DB connect configuration
+	dbService := dbservice.New()
+	dbService.Migrate()
+	dbService.InitData()
 }
