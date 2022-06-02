@@ -62,7 +62,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Todo  func(childComplexity int, id string) int
+		Todo  func(childComplexity int, id uuid.UUID) int
 		Todos func(childComplexity int) int
 		User  func(childComplexity int, id string) int
 		Users func(childComplexity int) int
@@ -103,19 +103,16 @@ type MutationResolver interface {
 	UpdateTodo(ctx context.Context, input model.EditTodo) (*model.Todo, error)
 	DeleteUser(ctx context.Context, id string) (bool, error)
 	DeleteTodo(ctx context.Context, id uuid.UUID) (bool, error)
-	DeleteTodos(ctx context.Context, input []uuid.UUID) (*int, error)
+	DeleteTodos(ctx context.Context, input []uuid.UUID) (*int64, error)
 }
 type QueryResolver interface {
-	Todo(ctx context.Context, id string) (*model.Todo, error)
+	Todo(ctx context.Context, id uuid.UUID) (*model.Todo, error)
 	Todos(ctx context.Context) ([]*model.Todo, error)
 	User(ctx context.Context, id string) (*model.User, error)
 	Users(ctx context.Context) ([]*model.User, error)
 }
 type TodoResolver interface {
-	TodoExt(ctx context.Context, obj *model.Todo) (*model.TodoExt, error)
-
 	User(ctx context.Context, obj *model.Todo) (*model.User, error)
-	Tags(ctx context.Context, obj *model.Todo) ([]*model.Tag, error)
 }
 
 type executableSchema struct {
@@ -241,7 +238,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Todo(childComplexity, args["id"].(string)), true
+		return e.complexity.Query.Todo(childComplexity, args["id"].(uuid.UUID)), true
 
 	case "Query.todos":
 		if e.complexity.Query.Todos == nil {
@@ -451,9 +448,10 @@ var sources = []*ast.Source{
 	{Name: "../schema.graphqls", Input: `# GraphQL schema example
 #
 # https://gqlgen.com/getting-started/
+scalar Int64
 
 type Query {
-  todo(id: ID!): Todo
+  todo(id: UUID!): Todo
   todos: [Todo!]!
   user(id: ID!): User
   users: [User!]!
@@ -466,7 +464,7 @@ type Mutation {
   updateTodo(input: EditTodo!): Todo!
   deleteUser(id: ID!): Boolean!
   deleteTodo(id: UUID!): Boolean!
-  deleteTodos(input: [UUID!]!): Int
+  deleteTodos(input: [UUID!]!): Int64
 }
 `, BuiltIn: false},
 	{Name: "../todo.graphqls", Input: `scalar UUID
@@ -503,7 +501,7 @@ input NewTodo {
   isDone: Boolean
   todoExt: NewTodoExt!
   userId: String!
-  tags: [UUID!]
+  tagIds: [UUID!]
 }
 
 input EditTodo {
@@ -511,7 +509,7 @@ input EditTodo {
   title: String!
   isDone: Boolean
   todoExt: EditTodoExt
-  tags: [UUID!]
+  tagIds: [UUID!]
   # userId: String!
 }
 
@@ -521,6 +519,7 @@ input NewTodoExt {
 }
 
 input EditTodoExt {
+  id: UUID!
   description: String
   priorityId: Int
 }`, BuiltIn: false},
@@ -670,10 +669,10 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 func (ec *executionContext) field_Query_todo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
+	var arg0 uuid.UUID
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		arg0, err = ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1132,9 +1131,9 @@ func (ec *executionContext) _Mutation_deleteTodos(ctx context.Context, field gra
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(*int64)
 	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return ec.marshalOInt642ᚖint64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_deleteTodos(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1144,7 +1143,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteTodos(ctx context.Contex
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type Int64 does not have child fields")
 		},
 	}
 	defer func() {
@@ -1257,7 +1256,7 @@ func (ec *executionContext) _Query_todo(ctx context.Context, field graphql.Colle
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Todo(rctx, fc.Args["id"].(string))
+		return ec.resolvers.Query().Todo(rctx, fc.Args["id"].(uuid.UUID))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1842,7 +1841,7 @@ func (ec *executionContext) _Todo_todoExt(ctx context.Context, field graphql.Col
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Todo().TodoExt(rctx, obj)
+		return obj.TodoExt, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1863,8 +1862,8 @@ func (ec *executionContext) fieldContext_Todo_todoExt(ctx context.Context, field
 	fc = &graphql.FieldContext{
 		Object:     "Todo",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -1984,7 +1983,7 @@ func (ec *executionContext) _Todo_tags(ctx context.Context, field graphql.Collec
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Todo().Tags(rctx, obj)
+		return obj.Tags, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2002,8 +2001,8 @@ func (ec *executionContext) fieldContext_Todo_tags(ctx context.Context, field gr
 	fc = &graphql.FieldContext{
 		Object:     "Todo",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -4092,11 +4091,11 @@ func (ec *executionContext) unmarshalInputEditTodo(ctx context.Context, obj inte
 			if err != nil {
 				return it, err
 			}
-		case "tags":
+		case "tagIds":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tags"))
-			it.Tags, err = ec.unmarshalOUUID2ᚕgithubᚗcomᚋgoogleᚋuuidᚐUUIDᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tagIds"))
+			it.TagIds, err = ec.unmarshalOUUID2ᚕgithubᚗcomᚋgoogleᚋuuidᚐUUIDᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4115,6 +4114,14 @@ func (ec *executionContext) unmarshalInputEditTodoExt(ctx context.Context, obj i
 
 	for k, v := range asMap {
 		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.Id, err = ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "description":
 			var err error
 
@@ -4209,11 +4216,11 @@ func (ec *executionContext) unmarshalInputNewTodo(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
-		case "tags":
+		case "tagIds":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tags"))
-			it.Tags, err = ec.unmarshalOUUID2ᚕgithubᚗcomᚋgoogleᚋuuidᚐUUIDᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tagIds"))
+			it.TagIds, err = ec.unmarshalOUUID2ᚕgithubᚗcomᚋgoogleᚋuuidᚐUUIDᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4607,25 +4614,12 @@ func (ec *executionContext) _Todo(ctx context.Context, sel ast.SelectionSet, obj
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "todoExt":
-			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Todo_todoExt(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
+			out.Values[i] = ec._Todo_todoExt(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
 			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
 		case "userId":
 
 			out.Values[i] = ec._Todo_userId(ctx, field, obj)
@@ -4648,22 +4642,9 @@ func (ec *executionContext) _Todo(ctx context.Context, sel ast.SelectionSet, obj
 
 			})
 		case "tags":
-			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Todo_tags(ctx, field, obj)
-				return res
-			}
+			out.Values[i] = ec._Todo_tags(ctx, field, obj)
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5206,10 +5187,6 @@ func (ec *executionContext) marshalNTodo2ᚖexampleᚋgraphqlᚋgraphᚋmodelᚐ
 	return ec._Todo(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNTodoExt2exampleᚋgraphqlᚋgraphᚋmodelᚐTodoExt(ctx context.Context, sel ast.SelectionSet, v model.TodoExt) graphql.Marshaler {
-	return ec._TodoExt(ctx, sel, &v)
-}
-
 func (ec *executionContext) marshalNTodoExt2ᚖexampleᚋgraphqlᚋgraphᚋmodelᚐTodoExt(ctx context.Context, sel ast.SelectionSet, v *model.TodoExt) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -5622,19 +5599,19 @@ func (ec *executionContext) marshalOInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+func (ec *executionContext) unmarshalOInt642ᚖint64(ctx context.Context, v interface{}) (*int64, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := graphql.UnmarshalInt(v)
+	res, err := graphql.UnmarshalInt64(v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+func (ec *executionContext) marshalOInt642ᚖint64(ctx context.Context, sel ast.SelectionSet, v *int64) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	res := graphql.MarshalInt(*v)
+	res := graphql.MarshalInt64(*v)
 	return res
 }
 

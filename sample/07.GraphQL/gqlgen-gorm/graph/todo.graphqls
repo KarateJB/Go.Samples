@@ -32,7 +32,7 @@ input NewTodo {
   isDone: Boolean
   todoExt: NewTodoExt!
   userId: String!
-  tags: [UUID!]
+  tagIds: [UUID!]
 }
 
 input EditTodo {
@@ -40,7 +40,7 @@ input EditTodo {
   title: String!
   isDone: Boolean
   todoExt: EditTodoExt
-  tags: [UUID!]
+  tagIds: [UUID!]
   # userId: String!
 }
 
@@ -50,6 +50,7 @@ input NewTodoExt {
 }
 
 input EditTodoExt {
+  id: UUID!
   description: String
   priorityId: Int
 }

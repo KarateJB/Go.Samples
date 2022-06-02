@@ -1,9 +1,10 @@
 # GraphQL schema example
 #
 # https://gqlgen.com/getting-started/
+scalar Int64
 
 type Query {
-  todo(id: ID!): Todo
+  todo(id: UUID!): Todo
   todos: [Todo!]!
   user(id: ID!): User
   users: [User!]!
@@ -16,5 +17,5 @@ type Mutation {
   updateTodo(input: EditTodo!): Todo!
   deleteUser(id: ID!): Boolean!
   deleteTodo(id: UUID!): Boolean!
-  deleteTodos(input: [UUID!]!): Int
+  deleteTodos(input: [UUID!]!): Int64
 }

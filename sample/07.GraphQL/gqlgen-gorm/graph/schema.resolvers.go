@@ -8,14 +8,17 @@ import (
 	"example/graphql/graph/generated"
 	"example/graphql/graph/model"
 	dbservice "example/graphql/services/db"
+	todoservice "example/graphql/services/todo"
 	userservice "example/graphql/services/user"
 	"fmt"
 
 	"github.com/google/uuid"
-	"golang.org/x/exp/slices"
 )
 
-var userService *userservice.UserAccess = userservice.New((dbservice.New()).DB)
+var (
+	userService *userservice.UserAccess = userservice.New((dbservice.New()).DB)
+	todoService *todoservice.TodoAccess = todoservice.New((dbservice.New()).DB)
+)
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
 	createduser := userService.Create(&input)
@@ -23,31 +26,26 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 }
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	todo := &model.Todo{
-		Id:     uuid.New(),
-		Title:  input.Title,
-		IsDone: input.IsDone,
-		UserId: input.UserId,
-	}
-
-	r.todos = append(r.todos, todo)
-	return todo, nil
+	createdTodo := todoService.Create(&input)
+	return createdTodo, nil
 }
 
 func (r *mutationResolver) UpdateUser(ctx context.Context, input model.EditUser) (*model.User, error) {
-	updatedUser := userService.Update(&input)
-	return updatedUser, nil
+	updatedUser, updatedCount := userService.Update(&input)
+	if updatedCount == 1 {
+		return updatedUser, nil
+	} else {
+		return nil, fmt.Errorf("User (Id: %s) not found", input.Id)
+	}
 }
 
 func (r *mutationResolver) UpdateTodo(ctx context.Context, input model.EditTodo) (*model.Todo, error) {
-	for index, todo := range r.todos {
-		if todo.Id == input.Id {
-			r.todos[index].Title, r.todos[index].IsDone = input.Title, input.IsDone
-			return r.todos[index], nil
-		}
+	updatedTodo, updatedCount := todoService.Update(&input)
+	if updatedCount == 1 {
+		return updatedTodo, nil
+	} else {
+		return nil, fmt.Errorf("TODO (Id: %s) not found", input.Id.String())
 	}
-
-	return nil, nil
 }
 
 func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (bool, error) {
@@ -61,32 +59,26 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (bool, err
 
 func (r *mutationResolver) DeleteTodo(ctx context.Context, id uuid.UUID) (bool, error) {
 	const deleteOk = true
-	for index, todo := range r.todos {
-		if todo.Id == id {
-			r.todos = slices.Delete(r.todos, index, index+1)
-			return deleteOk, nil
-		}
+	if cnt := todoService.DeleteOne(id); cnt == 1 {
+		return deleteOk, nil
+	} else {
+		return !deleteOk, fmt.Errorf("TODO (Id: %s) not found", id.String())
 	}
-
-	return !deleteOk, nil
 }
 
-func (r *mutationResolver) DeleteTodos(ctx context.Context, input []uuid.UUID) (*int, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) DeleteTodos(ctx context.Context, input []uuid.UUID) (*int64, error) {
+	deletedCnt := todoService.Delete(&input)
+	return &deletedCnt, nil
 }
 
-func (r *queryResolver) Todo(ctx context.Context, id string) (*model.Todo, error) {
-	for _, todo := range r.todos {
-		if todo.Id.String() == id {
-			return todo, nil
-		}
-	}
-
-	return nil, nil
+func (r *queryResolver) Todo(ctx context.Context, id uuid.UUID) (*model.Todo, error) {
+	todo := todoService.GetOne(id)
+	return todo, nil
 }
 
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	return r.todos, nil
+	todos := todoService.GetAll()
+	return todos, nil
 }
 
 func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
