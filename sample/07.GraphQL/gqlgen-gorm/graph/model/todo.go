@@ -12,20 +12,25 @@ type Todo struct {
 	Tags    []*Tag    `json:"tags"`
 }
 
-type NewTodo struct {
-	Title   string      `json:"title"`
-	IsDone  bool        `json:"isDone"`
-	TodoExt *NewTodoExt `json:"todoExt"`
-	UserId  string      `json:"userId"`
-	TagIds  []uuid.UUID `json:"tags"`
-}
-
 type EditTodo struct {
 	Id      uuid.UUID    `json:"id"`
 	Title   string       `json:"title"`
 	IsDone  bool         `json:"isDone"`
 	TodoExt *EditTodoExt `json:"todoExt"`
-	TagIds  []uuid.UUID  `json:"tags"`
+	Tags    []*NewTag    `json:"tags"`
+}
+
+type NewTag struct {
+	Id   uuid.UUID `json:"id"`
+	Name string    `json:"name"`
+}
+
+type NewTodo struct {
+	Title   string      `json:"title"`
+	IsDone  bool        `json:"isDone"`
+	TodoExt *NewTodoExt `json:"todoExt"`
+	UserId  string      `json:"userId"`
+	Tags    []*NewTag   `json:"tags"`
 }
 
 type EditTodoExt struct {

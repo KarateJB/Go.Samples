@@ -92,7 +92,11 @@ func (m *TodoAccess) Create(todo *models.NewTodo) *models.Todo {
 	m.DB.Model(&entity).Association("Tags").Append(entity.Tags)
 
 	// Optional: if we use the custom many-to-many relation table "TodoTags"
-	todoTags := utils.Map(todo.TagIds, func(tagId uuid.UUID) dbtypes.TodoTag {
+	tagIds := utils.Map(todo.Tags, func(tag *models.NewTag) uuid.UUID {
+		return tag.Id
+	})
+	todoTags := utils.Map(tagIds, func(tagId uuid.UUID) dbtypes.TodoTag {
+		// TODO: If not existed, create the tag
 		return dbtypes.TodoTag{TodoId: entity.Id, TagId: tagId}
 	})
 	m.DB.Create(&todoTags)
@@ -127,7 +131,11 @@ func (m *TodoAccess) Update(todo *models.EditTodo) (*models.Todo, int64) {
 
 	// Optional: if we use the custom many-to-many relation table "TodoTags"
 	m.DB.Model(&dbtypes.TodoTag{}).Where(`"TodoId" = ?`, todo.Id).Delete(&dbtypes.TodoTag{})
-	todoTags := utils.Map(todo.TagIds, func(tagId uuid.UUID) dbtypes.TodoTag {
+	tagIds := utils.Map(todo.Tags, func(tag *models.NewTag) uuid.UUID {
+		return tag.Id
+	})
+	todoTags := utils.Map(tagIds, func(tagId uuid.UUID) dbtypes.TodoTag {
+		// TODO: If not existed, create the tag
 		return dbtypes.TodoTag{TodoId: todo.Id, TagId: tagId}
 	})
 	m.DB.Create(&todoTags)

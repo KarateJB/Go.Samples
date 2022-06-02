@@ -382,6 +382,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputEditTodo,
 		ec.unmarshalInputEditTodoExt,
 		ec.unmarshalInputEditUser,
+		ec.unmarshalInputNewTag,
 		ec.unmarshalInputNewTodo,
 		ec.unmarshalInputNewTodoExt,
 		ec.unmarshalInputNewUser,
@@ -496,12 +497,17 @@ type Tag {
   name: String!
 }
 
+input NewTag {
+  id: UUID!
+  name: String
+}
+
 input NewTodo {
   title: String!
   isDone: Boolean
   todoExt: NewTodoExt!
   userId: String!
-  tagIds: [UUID!]
+  tags: [NewTag!]
 }
 
 input EditTodo {
@@ -509,7 +515,7 @@ input EditTodo {
   title: String!
   isDone: Boolean
   todoExt: EditTodoExt
-  tagIds: [UUID!]
+  tags: [NewTag!]
   # userId: String!
 }
 
@@ -4091,11 +4097,11 @@ func (ec *executionContext) unmarshalInputEditTodo(ctx context.Context, obj inte
 			if err != nil {
 				return it, err
 			}
-		case "tagIds":
+		case "tags":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tagIds"))
-			it.TagIds, err = ec.unmarshalOUUID2ᚕgithubᚗcomᚋgoogleᚋuuidᚐUUIDᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tags"))
+			it.Tags, err = ec.unmarshalONewTag2ᚕᚖexampleᚋgraphqlᚋgraphᚋmodelᚐNewTagᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4175,6 +4181,37 @@ func (ec *executionContext) unmarshalInputEditUser(ctx context.Context, obj inte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewTag(ctx context.Context, obj interface{}) (model.NewTag, error) {
+	var it model.NewTag
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.Id, err = ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewTodo(ctx context.Context, obj interface{}) (model.NewTodo, error) {
 	var it model.NewTodo
 	asMap := map[string]interface{}{}
@@ -4216,11 +4253,11 @@ func (ec *executionContext) unmarshalInputNewTodo(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
-		case "tagIds":
+		case "tags":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tagIds"))
-			it.TagIds, err = ec.unmarshalOUUID2ᚕgithubᚗcomᚋgoogleᚋuuidᚐUUIDᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tags"))
+			it.Tags, err = ec.unmarshalONewTag2ᚕᚖexampleᚋgraphqlᚋgraphᚋmodelᚐNewTagᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5089,6 +5126,11 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 	return res
 }
 
+func (ec *executionContext) unmarshalNNewTag2ᚖexampleᚋgraphqlᚋgraphᚋmodelᚐNewTag(ctx context.Context, v interface{}) (*model.NewTag, error) {
+	res, err := ec.unmarshalInputNewTag(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNNewTodo2exampleᚋgraphqlᚋgraphᚋmodelᚐNewTodo(ctx context.Context, v interface{}) (model.NewTodo, error) {
 	res, err := ec.unmarshalInputNewTodo(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -5615,6 +5657,26 @@ func (ec *executionContext) marshalOInt642ᚖint64(ctx context.Context, sel ast.
 	return res
 }
 
+func (ec *executionContext) unmarshalONewTag2ᚕᚖexampleᚋgraphqlᚋgraphᚋmodelᚐNewTagᚄ(ctx context.Context, v interface{}) ([]*model.NewTag, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.NewTag, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNNewTag2ᚖexampleᚋgraphqlᚋgraphᚋmodelᚐNewTag(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
 func (ec *executionContext) marshalOPriority2ᚖexampleᚋgraphqlᚋgraphᚋmodelᚐPriority(ctx context.Context, sel ast.SelectionSet, v *model.Priority) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -5700,44 +5762,6 @@ func (ec *executionContext) marshalOTodo2ᚖexampleᚋgraphqlᚋgraphᚋmodelᚐ
 		return graphql.Null
 	}
 	return ec._Todo(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOUUID2ᚕgithubᚗcomᚋgoogleᚋuuidᚐUUIDᚄ(ctx context.Context, v interface{}) ([]uuid.UUID, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
-	var err error
-	res := make([]uuid.UUID, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalOUUID2ᚕgithubᚗcomᚋgoogleᚋuuidᚐUUIDᚄ(ctx context.Context, sel ast.SelectionSet, v []uuid.UUID) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	for i := range v {
-		ret[i] = ec.marshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, sel, v[i])
-	}
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
 }
 
 func (ec *executionContext) marshalOUser2ᚖexampleᚋgraphqlᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {

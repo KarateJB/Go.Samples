@@ -27,12 +27,17 @@ type Tag {
   name: String!
 }
 
+input NewTag {
+  id: UUID!
+  name: String
+}
+
 input NewTodo {
   title: String!
   isDone: Boolean
   todoExt: NewTodoExt!
   userId: String!
-  tagIds: [UUID!]
+  tags: [NewTag!]
 }
 
 input EditTodo {
@@ -40,7 +45,7 @@ input EditTodo {
   title: String!
   isDone: Boolean
   todoExt: EditTodoExt
-  tagIds: [UUID!]
+  tags: [NewTag!]
   # userId: String!
 }
 
