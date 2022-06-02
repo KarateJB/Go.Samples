@@ -85,7 +85,7 @@ func (m *TodoAccess) Search(queryValTitle string, queryValIsDone bool) *[]types.
 }
 
 // Create: create a new TODO
-func (m *TodoAccess) Create(todo *types.Todo) *dbtypes.Todo {
+func (m *TodoAccess) Create(todo *types.Todo) *types.Todo {
 	var entity dbtypes.Todo
 	automapper.MapLoose(todo, &entity)
 	m.DB.Create(&entity)
@@ -100,7 +100,8 @@ func (m *TodoAccess) Create(todo *types.Todo) *dbtypes.Todo {
 	})
 
 	m.DB.Create(&todoTags)
-	return &entity
+	createdTodo := m.GetOne(entity.Id)
+	return createdTodo
 }
 
 // Update: update the TODO
