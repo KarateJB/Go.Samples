@@ -68,9 +68,9 @@ func (m *UserAccess) Update(user *models.EditUser) (*models.User, int64) {
 	var entity *dbtypes.User
 	var updatedCount int64
 	var updatedUser *models.User
-	m.DB.Model(&dbtypes.User{}).Where(`"Id" = ?`, user.Id).First(&entity).Updates(dbtypes.User{
+	m.DB.Model(&dbtypes.User{}).Where(`"Id" = ?`, user.Id).Updates(dbtypes.User{
 		Name: user.Name,
-	}).Count(&updatedCount)
+	}).First(&entity).Count(&updatedCount)
 
 	automapper.MapLoose(entity, &updatedUser)
 	return updatedUser, updatedCount
