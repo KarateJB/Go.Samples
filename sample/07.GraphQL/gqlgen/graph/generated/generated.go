@@ -343,49 +343,12 @@ var sources = []*ast.Source{
 	{Name: "../schema.graphqls", Input: `# GraphQL schema example
 #
 # https://gqlgen.com/getting-started/
-scalar UUID
-
-type Todo {
-  id: UUID!
-  title: String!
-  isDone: Boolean!
-  userId: String
-  user: User
-}
-
-type User {
-  id: ID!
-  name: String!
-}
 
 type Query {
   todo(id: ID!): Todo
   todos: [Todo!]!
   user(id: ID!): User
   users: [User!]!
-}
-
-input NewTodo {
-  title: String!
-  isDone: Boolean
-  userId: String!
-}
-
-input NewUser {
-  id: ID!
-  name: String!
-}
-
-input EditTodo {
-  id: UUID!
-  title: String!
-  isDone: Boolean
-  # userId: String!
-}
-
-input EditUser {
-  id: ID!
-  name: String!
 }
 
 type Mutation {
@@ -396,6 +359,45 @@ type Mutation {
   deleteUser(id: ID!): Boolean!
   deleteTodo(id: UUID!): Boolean!
 }
+`, BuiltIn: false},
+	{Name: "../todo.graphqls", Input: `scalar UUID
+
+type Todo {
+  id: UUID!
+  title: String!
+  isDone: Boolean!
+  userId: String
+  user: User
+}
+
+input NewTodo {
+  title: String!
+  isDone: Boolean
+  userId: String!
+}
+
+input EditTodo {
+  id: UUID!
+  title: String!
+  isDone: Boolean
+  # userId: String!
+}
+`, BuiltIn: false},
+	{Name: "../user.graphqls", Input: `type User {
+  id: ID!
+  name: String!
+}
+
+input NewUser {
+  id: ID!
+  name: String!
+}
+
+input EditUser {
+  id: ID!
+  name: String!
+}
+
 `, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
