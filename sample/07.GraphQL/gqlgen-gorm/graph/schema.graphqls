@@ -16,4 +16,5 @@ type Mutation {
   updateTodo(input: EditTodo!): Todo!
   deleteUser(id: ID!): Boolean!
   deleteTodo(id: UUID!): Boolean!
+  deleteTodos(input: [UUID!]!): Int
 }
