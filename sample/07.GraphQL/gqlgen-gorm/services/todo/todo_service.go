@@ -31,7 +31,11 @@ func (m *TodoAccess) GetAll() []*models.Todo {
 	var todos []*models.Todo
 	var count int64
 
-	m.DB.Preload(clause.Associations).Preload("TodoExt.Priority").Find(&entities).Count(&count)
+	// Navigate all fields
+	// m.DB.Preload(clause.Associations).Preload("TodoExt.Priority").Find(&entities).Count(&count)
+
+	// Navigate only "Tags". "TodoExt" and "User" will be queried by TodoResolver when required from Query.
+	m.DB.Preload("Tags").Find(&entities).Count(&count)
 
 	if count > 0 {
 		for _, entity := range entities {
@@ -51,8 +55,11 @@ func (m *TodoAccess) GetOne(id uuid.UUID) *models.Todo {
 	var todo *models.Todo
 	var count int64
 
-	m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, id).Preload(clause.Associations).Preload("TodoExt.Priority").First(&entity).Count(&count)
-	// m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, id).Joins("TodoExt").First(&entity).Count(&count) // Or specify the outer join target
+	// Navigate all fields
+	// m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, id).Preload(clause.Associations).Preload("TodoExt.Priority").First(&entity).Count(&count)
+
+	// Navigate only "Tags". "TodoExt" and "User" will be queried by TodoResolver when required from Query.
+	m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, id).Preload("Tags").First(&entity).Count(&count)
 
 	if count > 0 {
 		automapper.MapLoose(entity, &todo)
