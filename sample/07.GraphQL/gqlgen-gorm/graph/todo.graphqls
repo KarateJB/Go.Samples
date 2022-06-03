@@ -1,0 +1,61 @@
+scalar UUID
+
+type Todo {
+  id: UUID!
+  title: String!
+  isDone: Boolean!
+  todoExt: TodoExt!
+  userId: String
+  user: User
+  tags: [Tag!]
+}
+
+type TodoExt {
+  id: UUID!
+  description: String
+  priorityId: Int
+  priority: Priority
+}
+
+type Priority {
+  id: Int
+  name: String
+}
+
+type Tag {
+  id: UUID!
+  name: String!
+}
+
+input NewTag {
+  id: UUID!
+  name: String
+}
+
+input NewTodo {
+  title: String!
+  isDone: Boolean
+  todoExt: NewTodoExt!
+  userId: String!
+  tags: [NewTag!]
+}
+
+input EditTodo {
+  id: UUID!
+  title: String!
+  isDone: Boolean
+  todoExt: EditTodoExt
+  userId: String
+  tags: [NewTag!]
+}
+
+input NewTodoExt {
+  description: String
+  priorityId: Int 
+}
+
+input EditTodoExt {
+  id: UUID!
+  description: String
+  priorityId: Int
+}

@@ -89,13 +89,9 @@ func PostTodo(c *gin.Context) {
 		c.Writer.WriteHeader(http.StatusBadRequest)
 	}
 
-	entity := todoService.Create(&newTodo)
+	createdTodo := todoService.Create(&newTodo)
 
-	// Get the auto-generated Id
-	newTodo.Id = entity.Id
-	newTodo.TodoExt.Id = entity.TodoExt.Id
-
-	c.IndentedJSON(http.StatusCreated, newTodo)
+	c.IndentedJSON(http.StatusCreated, createdTodo)
 }
 
 // @Tags Todo

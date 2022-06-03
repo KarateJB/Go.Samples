@@ -29,7 +29,7 @@ $ curl -X POST "http://localhost:8001/api/todo" --include --header "Content-Type
 
 // Update the TODO
 curl -X PUT "http://localhost:8001/api/todo" --include --header "Content-Type: application/json" \
-  --data '{ "id": "d23359d5-2e2f-4e04-84cc-2db7d6e281e3", "title": "ZZZZ", "isDone": true, "userId": "JB", "todoExt": {"id": "d23359d5-2e2f-4e04-84cc-2db7d6e281e3", "description": "WWWW", "priorityId": 3}, "tags": [{"id": "6aee5542-3f70-4cbc-ab05-fd020285f021"}] }'
+  --data '{ "id": "8069b6a4-7497-40b9-9ad0-d06209f9ad1c", "title": "ZZZZ", "isDone": true, "userId": "JB", "todoExt": {"id": "8069b6a4-7497-40b9-9ad0-d06209f9ad1c", "description": "WWWW", "priorityId": 3}, "tags": [{"id": "6aee5542-3f70-4cbc-ab05-fd020285f021"}] }'
 
 // DELETe the TODO
 $ curl -X DELETE "http://localhost:8001/api/todo" --include --header "Content-Type: application/json" \

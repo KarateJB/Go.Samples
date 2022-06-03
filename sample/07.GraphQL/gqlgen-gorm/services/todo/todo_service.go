@@ -2,9 +2,9 @@ package todoservice
 
 import (
 	"database/sql"
-	types "example/webservice/types/api"
-	dbtypes "example/webservice/types/db"
-	"example/webservice/utils"
+	models "example/graphql/graph/model"
+	dbtypes "example/graphql/types/db"
+	"example/graphql/utils"
 	"fmt"
 	"time"
 
@@ -26,54 +26,75 @@ func New(db *gorm.DB) *TodoAccess {
 }
 
 // GetAll: get all TODOs
-func (m *TodoAccess) GetAll() *[]types.Todo {
-	var entities *[]dbtypes.Todo
-	var todos []types.Todo
-	var count int64
+func (m *TodoAccess) GetAll() []*models.Todo {
+	var entities []dbtypes.Todo
+	var todos []*models.Todo
+	var cnt int64
 
-	m.DB.Preload(clause.Associations).Preload("TodoExt.Priority").Find(&entities).Count(&count)
+	// Navigate all fields
+	// m.DB.Preload(clause.Associations).Preload("TodoExt.Priority").Find(&entities).Count(&cnt)
 
-	if count > 0 {
-		for _, entity := range *entities {
-			var todo types.Todo
+	// Navigate only "Tags". "TodoExt" and "User" will be queried by TodoResolver when required from Query.
+	m.DB.Preload("Tags").Find(&entities).Count(&cnt)
+
+	if cnt > 0 {
+		for _, entity := range entities {
+			var todo *models.Todo
 			automapper.MapLoose(entity, &todo)
 			todos = append(todos, todo)
 		}
-		return &todos
+		return todos
 	} else {
 		return nil
 	}
 }
 
 // GetOne: get the TODO by Id
-func (m *TodoAccess) GetOne(id uuid.UUID) *types.Todo {
+func (m *TodoAccess) GetOne(id uuid.UUID) *models.Todo {
 	var entity *dbtypes.Todo
-	var todo *types.Todo
-	var count int64
+	var todo *models.Todo
+	var cnt int64
 
-	m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, id).Preload(clause.Associations).Preload("TodoExt.Priority").First(&entity).Count(&count)
-	// m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, id).Joins("TodoExt").First(&entity).Count(&count) // Or specify the outer join target
+	// Navigate all fields
+	// m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, id).Preload(clause.Associations).Preload("TodoExt.Priority").First(&entity).Count(&cnt)
 
-	if count > 0 {
+	// Navigate only "Tags". "TodoExt" and "User" will be queried by TodoResolver when required from Query.
+	m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, id).Preload("Tags").First(&entity).Count(&cnt)
+
+	if cnt > 0 {
 		automapper.MapLoose(entity, &todo)
 	}
 	return todo
 }
 
+// GetExt: get the TodoExt by Id
+func (m *TodoAccess) GetExt(id uuid.UUID) *models.TodoExt {
+	var entity *dbtypes.TodoExt
+	var todoExt *models.TodoExt
+	var cnt int64
+	m.DB.Model(&dbtypes.TodoExt{}).Where(`"Id" = ?`, id).Preload("Priority").First(&entity).Count(&cnt)
+
+	if cnt > 0 {
+		automapper.MapLoose(entity, &todoExt)
+	}
+
+	return todoExt
+}
+
 // Search: search TODOs that its Title contains "queryValTitle" and IsDone matchs "queryValIsDone"
-func (m *TodoAccess) Search(queryValTitle string, queryValIsDone bool) *[]types.Todo {
+func (m *TodoAccess) Search(queryValTitle string, queryValIsDone bool) *[]models.Todo {
 	var entities *[]dbtypes.Todo
-	var todos []types.Todo
-	var count int64
+	var todos []models.Todo
+	var cnt int64
 
 	m.DB.Model(entities).
 		Where(`"Title" LIKE ?`, fmt.Sprintf("%%%s%%", queryValTitle)). // Or use strings.Builder
 		Where(`"IsDone" = ?`, queryValIsDone).Preload(clause.Associations).
-		Preload("TodoExt.Priority").Find(&entities).Count(&count)
+		Preload("TodoExt.Priority").Find(&entities).Count(&cnt)
 
-	if count > 0 {
+	if cnt > 0 {
 		for _, entity := range *entities {
-			var todo types.Todo
+			var todo models.Todo
 			automapper.MapLoose(entity, &todo)
 			todos = append(todos, todo)
 		}
@@ -85,29 +106,30 @@ func (m *TodoAccess) Search(queryValTitle string, queryValIsDone bool) *[]types.
 }
 
 // Create: create a new TODO
-func (m *TodoAccess) Create(todo *types.Todo) *types.Todo {
+func (m *TodoAccess) Create(todo *models.NewTodo) *models.Todo {
 	var entity dbtypes.Todo
 	automapper.MapLoose(todo, &entity)
 	m.DB.Create(&entity)
 	m.DB.Model(&entity).Association("Tags").Append(entity.Tags)
 
 	// Optional: if we use the custom many-to-many relation table "TodoTags"
-	tagIds := utils.Map(todo.Tags, func(tag types.Tag) uuid.UUID {
+	tagIds := utils.Map(todo.Tags, func(tag *models.NewTag) uuid.UUID {
 		return tag.Id
 	})
 	todoTags := utils.Map(tagIds, func(tagId uuid.UUID) dbtypes.TodoTag {
+		// TODO: If not existed, create the tag
 		return dbtypes.TodoTag{TodoId: entity.Id, TagId: tagId}
 	})
-
 	m.DB.Create(&todoTags)
+
 	createdTodo := m.GetOne(entity.Id)
 	return createdTodo
 }
 
 // Update: update the TODO
-func (m *TodoAccess) Update(todo *types.Todo) int64 {
+func (m *TodoAccess) Update(todo *models.EditTodo) (*models.Todo, int64) {
 	var entity dbtypes.Todo
-	var updatedCount int64
+	var updatedCnt int64
 
 	automapper.MapLoose(todo, &entity)
 
@@ -118,7 +140,7 @@ func (m *TodoAccess) Update(todo *types.Todo) int64 {
 			Valid: true,
 		},
 	}
-	m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, todo.Id).Updates(&entity).Count(&updatedCount)
+	m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, todo.Id).Updates(&entity).Count(&updatedCnt)
 
 	// Update TodoExt
 	// m.DB.Model(&entity).Association("TodoExt").Append(&entity.TodoExt) // Not work, see https://github.com/go-gorm/gorm/issues/3487
@@ -130,43 +152,42 @@ func (m *TodoAccess) Update(todo *types.Todo) int64 {
 
 	// Optional: if we use the custom many-to-many relation table "TodoTags"
 	m.DB.Model(&dbtypes.TodoTag{}).Where(`"TodoId" = ?`, todo.Id).Delete(&dbtypes.TodoTag{})
-	tagIds := utils.Map(todo.Tags, func(tag types.Tag) uuid.UUID {
+	tagIds := utils.Map(todo.Tags, func(tag *models.NewTag) uuid.UUID {
 		return tag.Id
 	})
 	todoTags := utils.Map(tagIds, func(tagId uuid.UUID) dbtypes.TodoTag {
+		// TODO: If not existed, create the tag
 		return dbtypes.TodoTag{TodoId: todo.Id, TagId: tagId}
 	})
 	m.DB.Create(&todoTags)
 
-	return updatedCount
+	// Query the latest TODO
+	updatedTodo := m.GetOne(todo.Id)
+
+	return updatedTodo, updatedCnt
 }
 
 // DeleteOne: delete a TODO
-func (m *TodoAccess) DeleteOne(todo *types.Todo) int64 {
+func (m *TodoAccess) DeleteOne(id uuid.UUID) int64 {
 	// Optional: If we don't set CASCADE delete, then we can use Association to remove the relations, e.q. relations in todo_tags as following.
 	// var entity dbtypes.Todo
-	// m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, todo.Id).Preload("Tags").First(&entity)
+	// m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, id).Preload("Tags").First(&entity)
 	// m.DB.Model(&entity).Association("Tags").Delete(entity.Tags)
 
-	var count int64
-	m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, todo.Id).Count(&count).Delete(&dbtypes.Todo{})
+	var cnt int64
+	m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, id).Count(&cnt).Delete(&dbtypes.Todo{})
 
-	return count
+	return cnt
 }
 
 // Delete: delete one or more TODOs
-func (m *TodoAccess) Delete(todos *[]types.Todo) int64 {
-	var count int64
+func (m *TodoAccess) Delete(todoIds *[]uuid.UUID) int64 {
+	var cnt int64
 	var entities []dbtypes.Todo
 
-	// Get the Ids
-	todoIds := utils.Map(*todos, func(todo types.Todo) uuid.UUID {
-		return todo.Id
-	})
-
 	// m.DB.Model(&dbtypes.Todo{}).Where()
-	m.DB.Find(&entities, todoIds).Count(&count).Delete(&dbtypes.Todo{})
+	m.DB.Find(&entities, todoIds).Count(&cnt).Delete(&dbtypes.Todo{})
 	// db.Delete(&types.Todo{}, `"Id" IN ?`, todoIds)
 
-	return count
+	return cnt
 }
