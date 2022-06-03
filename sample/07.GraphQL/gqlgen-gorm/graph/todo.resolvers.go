@@ -7,15 +7,16 @@ import (
 	"context"
 	"example/graphql/graph/generated"
 	"example/graphql/graph/model"
+	"example/graphql/services"
 )
 
 func (r *todoResolver) TodoExt(ctx context.Context, obj *model.Todo) (*model.TodoExt, error) {
-	todoExt := todoService.GetExt(obj.Id)
+	todoExt := services.Todo.GetExt(obj.Id)
 	return todoExt, nil
 }
 
 func (r *todoResolver) User(ctx context.Context, obj *model.Todo) (*model.User, error) {
-	user := userService.GetOne(obj.UserId)
+	user := services.User.GetOne(obj.UserId)
 	return user, nil
 }
 
