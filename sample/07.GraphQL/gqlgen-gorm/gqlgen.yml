@@ -62,7 +62,7 @@ models:
   Todo:
     fields:
       todoExt:
-        resolver: false
+        resolver: true
       user:
         resolver: true
       tags:

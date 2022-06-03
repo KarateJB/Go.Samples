@@ -112,6 +112,8 @@ type QueryResolver interface {
 	Users(ctx context.Context) ([]*model.User, error)
 }
 type TodoResolver interface {
+	TodoExt(ctx context.Context, obj *model.Todo) (*model.TodoExt, error)
+
 	User(ctx context.Context, obj *model.Todo) (*model.User, error)
 }
 
@@ -1847,7 +1849,7 @@ func (ec *executionContext) _Todo_todoExt(ctx context.Context, field graphql.Col
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.TodoExt, nil
+		return ec.resolvers.Todo().TodoExt(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1868,8 +1870,8 @@ func (ec *executionContext) fieldContext_Todo_todoExt(ctx context.Context, field
 	fc = &graphql.FieldContext{
 		Object:     "Todo",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -4651,12 +4653,25 @@ func (ec *executionContext) _Todo(ctx context.Context, sel ast.SelectionSet, obj
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "todoExt":
+			field := field
 
-			out.Values[i] = ec._Todo_todoExt(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Todo_todoExt(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
 			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		case "userId":
 
 			out.Values[i] = ec._Todo_userId(ctx, field, obj)
@@ -5227,6 +5242,10 @@ func (ec *executionContext) marshalNTodo2ᚖexampleᚋgraphqlᚋgraphᚋmodelᚐ
 		return graphql.Null
 	}
 	return ec._Todo(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTodoExt2exampleᚋgraphqlᚋgraphᚋmodelᚐTodoExt(ctx context.Context, sel ast.SelectionSet, v model.TodoExt) graphql.Marshaler {
+	return ec._TodoExt(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNTodoExt2ᚖexampleᚋgraphqlᚋgraphᚋmodelᚐTodoExt(ctx context.Context, sel ast.SelectionSet, v *model.TodoExt) graphql.Marshaler {

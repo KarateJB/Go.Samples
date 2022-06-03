@@ -9,6 +9,11 @@ import (
 	"example/graphql/graph/model"
 )
 
+func (r *todoResolver) TodoExt(ctx context.Context, obj *model.Todo) (*model.TodoExt, error) {
+	todoExt := todoService.GetExt(obj.Id)
+	return todoExt, nil
+}
+
 func (r *todoResolver) User(ctx context.Context, obj *model.Todo) (*model.User, error) {
 	user := userService.GetOne(obj.UserId)
 	return user, nil
