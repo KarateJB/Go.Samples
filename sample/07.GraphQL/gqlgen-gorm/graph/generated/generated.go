@@ -517,8 +517,8 @@ input EditTodo {
   title: String!
   isDone: Boolean
   todoExt: EditTodoExt
+  userId: String
   tags: [NewTag!]
-  # userId: String!
 }
 
 input NewTodoExt {
@@ -4096,6 +4096,14 @@ func (ec *executionContext) unmarshalInputEditTodo(ctx context.Context, obj inte
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("todoExt"))
 			it.TodoExt, err = ec.unmarshalOEditTodoExt2ᚖexampleᚋgraphqlᚋgraphᚋmodelᚐEditTodoExt(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "userId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
+			it.UserId, err = ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}

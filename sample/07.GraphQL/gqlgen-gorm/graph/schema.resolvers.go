@@ -35,7 +35,7 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, input model.EditUser)
 	if updatedCount == 1 {
 		return updatedUser, nil
 	} else {
-		return nil, fmt.Errorf("User (Id: %s) not found", input.Id)
+		return nil, fmt.Errorf("User (Id: %s) not found or failed to update", input.Id)
 	}
 }
 
@@ -44,7 +44,7 @@ func (r *mutationResolver) UpdateTodo(ctx context.Context, input model.EditTodo)
 	if updatedCount == 1 {
 		return updatedTodo, nil
 	} else {
-		return nil, fmt.Errorf("TODO (Id: %s) not found", input.Id.String())
+		return nil, fmt.Errorf("TODO (Id: %s) not found or failed to update", input.Id.String())
 	}
 }
 
@@ -53,7 +53,7 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (bool, err
 	if cnt := userService.Delete(id); cnt == 1 {
 		return deleteOk, nil
 	} else {
-		return !deleteOk, fmt.Errorf("User (Id: %s) not found", id)
+		return !deleteOk, fmt.Errorf("User (Id: %s) not found or failed to delete", id)
 	}
 }
 
@@ -62,7 +62,7 @@ func (r *mutationResolver) DeleteTodo(ctx context.Context, id uuid.UUID) (bool, 
 	if cnt := todoService.DeleteOne(id); cnt == 1 {
 		return deleteOk, nil
 	} else {
-		return !deleteOk, fmt.Errorf("TODO (Id: %s) not found", id.String())
+		return !deleteOk, fmt.Errorf("TODO (Id: %s) not found or failed to delete", id.String())
 	}
 }
 

@@ -17,6 +17,7 @@ type EditTodo struct {
 	Title   string       `json:"title"`
 	IsDone  bool         `json:"isDone"`
 	TodoExt *EditTodoExt `json:"todoExt"`
+	UserId  string       `json:"userId"`
 	Tags    []*NewTag    `json:"tags"`
 }
 

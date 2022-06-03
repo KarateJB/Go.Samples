@@ -45,8 +45,8 @@ input EditTodo {
   title: String!
   isDone: Boolean
   todoExt: EditTodoExt
+  userId: String
   tags: [NewTag!]
-  # userId: String!
 }
 
 input NewTodoExt {
