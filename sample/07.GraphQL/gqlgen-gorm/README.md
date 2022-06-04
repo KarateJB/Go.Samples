@@ -32,3 +32,5 @@ go generate ./...
 
 - [Don’t eagerly fetch the user](https://gqlgen.com/getting-started/#dont-eagerly-fetch-the-user)
 - [Regenerating resolvers from schema removes comments of resolver methods #1069](https://github.com/99designs/gqlgen/issues/1069)
+- [Custom Directive: Supported locations](https://www.apollographql.com/docs/apollo-server/schema/creating-directives#supported-locations)
+- [Issue: Add field info to directive context](https://github.com/99designs/gqlgen/issues/1084)

@@ -8,6 +8,7 @@ require (
 	github.com/spf13/viper v1.12.0
 	github.com/stroiman/go-automapper v0.0.0-20200419053654-7c63d5bb0eb4
 	github.com/vektah/gqlparser/v2 v2.4.4
+	golang.org/x/exp v0.0.0-20220602145555-4a0574d9293f
 	gorm.io/driver/postgres v1.3.7
 	gorm.io/gorm v1.23.5
 )

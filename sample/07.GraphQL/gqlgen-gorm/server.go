@@ -21,6 +21,8 @@ func main() {
 	/* GraphQL */
 	gqlConfig := generated.Config{Resolvers: &graph.Resolver{}}
 	gqlConfig.Directives.MaskUserName = directives.MaskUserName
+	gqlConfig.Directives.HasTag = directives.HasTag
+	gqlConfig.Directives.CheckRules = directives.CheckRules
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(gqlConfig))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))

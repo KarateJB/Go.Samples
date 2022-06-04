@@ -3,6 +3,14 @@
 # https://gqlgen.com/getting-started/
 scalar Int64
 
+directive @checkRules(rules: [Rule!]) on FIELD_DEFINITION
+directive @hasTag on FIELD_DEFINITION
+
+enum Rule {
+    LIMITED_TAG
+    HAS_OWNER
+}
+
 type Query {
   todo(id: UUID!): Todo
   todos: [Todo!]!
@@ -12,10 +20,11 @@ type Query {
 
 type Mutation {
   createUser(input: NewUser!): User!
-  createTodo(input: NewTodo!): Todo!
+  createTodo(input: NewTodo!): Todo! """ @hasTag @checkRules(rules: [LIMITED_TAG, HAS_OWNER]) """
   updateUser(input: EditUser!): User!
   updateTodo(input: EditTodo!): Todo!
   deleteUser(id: ID!): Boolean!
   deleteTodo(id: UUID!): Boolean!
   deleteTodos(input: [UUID!]!): Int64
 }
+
