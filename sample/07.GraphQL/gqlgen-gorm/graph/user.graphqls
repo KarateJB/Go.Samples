@@ -1,8 +1,8 @@
-directive @mask on FIELD_DEFINITION
+directive @maskUserName on FIELD_DEFINITION
 
 type User {
   id: ID!
-  name: String! @mask
+  name: String! @maskUserName
 }
 
 input NewUser {

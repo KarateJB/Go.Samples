@@ -43,7 +43,7 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
-	Mask func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	MaskUserName func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 }
 
 type ComplexityRoot struct {
@@ -475,7 +475,7 @@ type Mutation {
 
 type Todo {
   id: UUID!
-  title: String! 
+  title: String!
   isDone: Boolean!
   todoExt: TodoExt!
   userId: String
@@ -532,11 +532,11 @@ input EditTodoExt {
   description: String
   priorityId: Int
 }`, BuiltIn: false},
-	{Name: "../user.graphqls", Input: `directive @mask on FIELD_DEFINITION
+	{Name: "../user.graphqls", Input: `directive @maskUserName on FIELD_DEFINITION
 
 type User {
   id: ID!
-  name: String! @mask
+  name: String! @maskUserName
 }
 
 input NewUser {
@@ -2262,10 +2262,10 @@ func (ec *executionContext) _User_name(ctx context.Context, field graphql.Collec
 			return obj.Name, nil
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Mask == nil {
-				return nil, errors.New("directive mask is not implemented")
+			if ec.directives.MaskUserName == nil {
+				return nil, errors.New("directive maskUserName is not implemented")
 			}
-			return ec.directives.Mask(ctx, obj, directive0)
+			return ec.directives.MaskUserName(ctx, obj, directive0)
 		}
 
 		tmp, err := directive1(rctx)
