@@ -3,6 +3,7 @@ package main
 import (
 	"example/graphql/config"
 	"example/graphql/graph"
+	directives "example/graphql/graph/directive"
 	"example/graphql/graph/generated"
 	dbservice "example/graphql/services/db"
 	"log"
@@ -18,7 +19,11 @@ func main() {
 	initDb()
 
 	/* GraphQL */
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
+	gqlConfig := generated.Config{Resolvers: &graph.Resolver{}}
+	gqlConfig.Directives.MaskUserName = directives.MaskUserName
+	gqlConfig.Directives.HasTag = directives.HasTag
+	gqlConfig.Directives.CheckRules = directives.CheckRules
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(gqlConfig))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)
