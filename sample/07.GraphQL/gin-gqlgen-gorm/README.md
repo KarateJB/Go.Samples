@@ -1,11 +1,15 @@
-# GraphQL: gqlgen + GORM
+# GraphQL: gin + gqlgen + GORM
 
-This is a sample code of creating a GraphQL server with [gqlgen](https://github.com/99designs/gqlgen), [GORM](https://github.com/go-gorm/ gorm) and PostgreSQL.
+This is a sample code of creating a RESTful API and GraphQL server with
+- [gin](https://github.com/gin-gonic/gin)
+- [gqlgen](https://github.com/99designs/gqlgen)
+- [GORM](https://github.com/go-gorm/ gorm) and PostgreSQL.
 
 
 ## Install packages
 
 ```s
+$ go get github.com/gin-gonic/gin
 $ go get github.com/99designs/gqlgen
 $ go run github.com/99designs/gqlgen init
 ```
@@ -30,7 +34,4 @@ go generate ./...
 
 ## Reference
 
-- [Don’t eagerly fetch the user](https://gqlgen.com/getting-started/#dont-eagerly-fetch-the-user)
-- [Regenerating resolvers from schema removes comments of resolver methods #1069](https://github.com/99designs/gqlgen/issues/1069)
-- [Custom Directive: Supported locations](https://www.apollographql.com/docs/apollo-server/schema/creating-directives#supported-locations)
-- [Issue: Add field info to directive context](https://github.com/99designs/gqlgen/issues/1084)
+- [Setup Gin and gqlgen together](https://github.com/99designs/gqlgen/blob/master/docs/content/recipes/gin.md)
