@@ -11,12 +11,12 @@ import (
 )
 
 func (r *todoResolver) TodoExt(ctx context.Context, obj *model.Todo) (*model.TodoExt, error) {
-	todoExt := services.Todo.GetExt(obj.Id)
+	todoExt := services.TodoGql.GetExt(obj.Id)
 	return todoExt, nil
 }
 
 func (r *todoResolver) User(ctx context.Context, obj *model.Todo) (*model.User, error) {
-	user := services.User.GetOne(obj.UserId)
+	user := services.UserGql.GetOne(obj.UserId)
 	return user, nil
 }
 

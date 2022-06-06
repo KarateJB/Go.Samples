@@ -1,9 +1,8 @@
 package todoapi
 
 import (
-	types "example/graphql/graph/model"
-	dbservice "example/graphql/services/db"
-	todoservice "example/graphql/services/todo"
+	models "example/graphql/graph/model"
+	services "example/graphql/services"
 	utils "example/graphql/utils"
 	"net/http"
 	"strconv"
@@ -11,8 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
-
-var todoService *todoservice.TodoAccess = todoservice.New((dbservice.New()).DB)
 
 // @Tags Todos
 // @Title Get all TODOs
@@ -23,7 +20,7 @@ var todoService *todoservice.TodoAccess = todoservice.New((dbservice.New()).DB)
 // @Success 200 {array} types.Todo "OK"
 // @Success 204 "No Content"
 func GetAllTodos(c *gin.Context) {
-	if todos := todoService.GetAll(); todos == nil {
+	if todos := services.TodoRf.GetAll(); todos == nil {
 		c.Writer.WriteHeader(http.StatusNoContent)
 	} else {
 		c.Header(utils.HttpHeaderRowCount, strconv.Itoa(len(todos)))
@@ -44,7 +41,7 @@ func GetTodo(c *gin.Context) {
 	id := c.Param("id") // Get the value from api/todo/:id
 	uuid, _ := uuid.Parse(id)
 
-	if todo := todoService.GetOne(uuid); todo == nil {
+	if todo := services.TodoRf.GetOne(uuid); todo == nil {
 		c.Writer.WriteHeader(http.StatusNoContent) // If not found, response 204
 	} else {
 		c.IndentedJSON(http.StatusOK, todo)
@@ -65,7 +62,7 @@ func SearchTodo(c *gin.Context) {
 	queryValTitle := c.Query("title")
 	queryValIsDone, _ := strconv.ParseBool(c.DefaultQuery("isDone", "false"))
 
-	if todos := todoService.Search(queryValTitle, queryValIsDone); todos == nil {
+	if todos := services.TodoRf.Search(queryValTitle, queryValIsDone); todos == nil {
 		c.Writer.WriteHeader(http.StatusNoContent)
 	} else {
 		c.Header(utils.HttpHeaderRowCount, strconv.Itoa(len(*todos)))
@@ -83,13 +80,13 @@ func SearchTodo(c *gin.Context) {
 // @Success 201 {object} types.Todo
 // @Failure 400 "Bad Request"
 func PostTodo(c *gin.Context) {
-	var newTodo types.NewTodo
+	var newTodo models.NewTodo
 	if err := c.BindJSON(&newTodo); err != nil {
 		// return
 		c.Writer.WriteHeader(http.StatusBadRequest)
 	}
 
-	createdTodo := todoService.Create(&newTodo)
+	createdTodo := services.TodoRf.Create(&newTodo)
 
 	c.IndentedJSON(http.StatusCreated, createdTodo)
 }
@@ -105,12 +102,12 @@ func PostTodo(c *gin.Context) {
 // @Failure 400 "Bad Request"
 // @Failure 422 "Unprocessable Entity"
 func PutTodo(c *gin.Context) {
-	var editTodo types.EditTodo
+	var editTodo models.EditTodo
 	if err := c.BindJSON(&editTodo); err != nil {
 		c.Writer.WriteHeader(http.StatusBadRequest)
 	}
 
-	if _, count := todoService.Update(&editTodo); count == 0 {
+	if _, count := services.TodoRf.Update(&editTodo); count == 0 {
 		c.Writer.WriteHeader(http.StatusUnprocessableEntity)
 	}
 }
@@ -126,12 +123,12 @@ func PutTodo(c *gin.Context) {
 // @Failure 400 "Bad Request"
 // @Failure 422 "Unprocessable Entity"
 func DeleteTodo(c *gin.Context) {
-	var deleteTodo types.Todo
+	var deleteTodo models.Todo
 	if err := c.BindJSON(&deleteTodo); err != nil {
 		c.Writer.WriteHeader(http.StatusBadRequest)
 	}
 
-	if count := todoService.DeleteOne(deleteTodo.Id); count == 0 {
+	if count := services.TodoRf.DeleteOne(deleteTodo.Id); count == 0 {
 		c.Writer.WriteHeader(http.StatusUnprocessableEntity)
 	}
 }
@@ -146,14 +143,14 @@ func DeleteTodo(c *gin.Context) {
 // @Success 200 "OK"
 // @Failure 400 "Bad Request"
 func DeleteTodos(c *gin.Context) {
-	var deleteTodos []types.Todo
+	var deleteTodos []models.Todo
 	if err := c.BindJSON(&deleteTodos); err != nil {
 		c.Writer.WriteHeader(http.StatusBadRequest)
 	}
 
-	todoIds := utils.Map(deleteTodos, func(todo types.Todo) uuid.UUID {
+	todoIds := utils.Map(deleteTodos, func(todo models.Todo) uuid.UUID {
 		return todo.Id
 	})
-	count := todoService.Delete(&todoIds)
+	count := services.TodoRf.Delete(&todoIds)
 	c.Header(utils.HttpHeaderRowCount, strconv.FormatInt(count, 10))
 }

@@ -30,8 +30,9 @@ type Todo struct {
 	Title          string    `gorm:"column:Title;not null"`
 	IsDone         bool      `gorm:"column:IsDone;not null;default:false"`
 	TrackDateTimes           // Or use gorm.Model instead
-	TodoExt        TodoExt   `gorm:"foreignkey:Id;references:Id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`      // HasOne relation on "TodoExt". The "TodoExt" will has a foreign key "Id" which has reference on "Todo"."Id"
-	UserId         string    `gorm:"column:UserId;default:NULL"`                                                     // If this field name is "UserId", we can ignore setting "foreignKey:Id" on "User" struct's field "Todos"
+	TodoExt        TodoExt   `gorm:"foreignkey:Id;references:Id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"` // HasOne relation on "TodoExt". The "TodoExt" will has a foreign key "Id" which has reference on "Todo"."Id"
+	UserId         string    `gorm:"column:UserId;default:NULL"`                                                // If this field name is "UserId", we can ignore setting "foreignKey:Id" on "User" struct's field "Todos"
+	User           User      `gorm:"foreignKey:UserId;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Tags           []*Tag    `gorm:"many2many:TodoTags;foreignKey:Id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"` // Many to many relation
 }
 

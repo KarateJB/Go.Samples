@@ -1,15 +1,12 @@
 package userapi
 
 import (
-	types "example/graphql/graph/model"
-	dbservice "example/graphql/services/db"
-	userservice "example/graphql/services/user"
+	models "example/graphql/graph/model"
+	services "example/graphql/services"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
-
-var userService *userservice.UserAccess = userservice.New((dbservice.New()).DB)
 
 // @Tags User
 // @Title Get the User by Id
@@ -23,7 +20,7 @@ var userService *userservice.UserAccess = userservice.New((dbservice.New()).DB)
 func GetUser(c *gin.Context) {
 	id := c.Param("id") // Get the value from api/user/:id
 
-	if user := userService.GetOne(id); user == nil {
+	if user := services.UserRf.GetOne(id); user == nil {
 		c.Writer.WriteHeader(http.StatusNoContent) // If not found, response 204
 	} else {
 		c.IndentedJSON(http.StatusOK, user)
@@ -40,13 +37,13 @@ func GetUser(c *gin.Context) {
 // @Success 201 {object} types.User
 // @Failure 400 "Bad Request"
 func PostUser(c *gin.Context) {
-	var newUser types.NewUser
+	var newUser models.NewUser
 	if err := c.BindJSON(&newUser); err != nil {
 		// return
 		c.Writer.WriteHeader(http.StatusBadRequest)
 	}
 
-	userService.Create(&newUser)
+	services.UserRf.Create(&newUser)
 	c.IndentedJSON(http.StatusCreated, newUser)
 }
 
@@ -61,12 +58,12 @@ func PostUser(c *gin.Context) {
 // @Failure 400 "Bad Request"
 // @Failure 422 "Unprocessable Entity"
 func PutUser(c *gin.Context) {
-	var editUser types.EditUser
+	var editUser models.EditUser
 	if err := c.BindJSON(&editUser); err != nil {
 		c.Writer.WriteHeader(http.StatusBadRequest)
 	}
 
-	if _, count := userService.Update(&editUser); count == 0 {
+	if _, count := services.UserRf.Update(&editUser); count == 0 {
 		c.Writer.WriteHeader(http.StatusUnprocessableEntity)
 	}
 }
@@ -82,12 +79,12 @@ func PutUser(c *gin.Context) {
 // @Failure 400 "Bad Request"
 // @Failure 422 "Unprocessable Entity"
 func DeleteUser(c *gin.Context) {
-	var deleteUser types.User
+	var deleteUser models.User
 	if err := c.BindJSON(&deleteUser); err != nil {
 		c.Writer.WriteHeader(http.StatusBadRequest)
 	}
 
-	if count := userService.Delete(deleteUser.Id); count == 0 {
+	if count := services.UserRf.Delete(deleteUser.Id); count == 0 {
 		c.Writer.WriteHeader(http.StatusUnprocessableEntity)
 	}
 }

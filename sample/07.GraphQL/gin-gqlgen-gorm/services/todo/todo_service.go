@@ -3,6 +3,7 @@ package todoservice
 import (
 	"database/sql"
 	models "example/graphql/graph/model"
+	types "example/graphql/types"
 	dbtypes "example/graphql/types/db"
 	"example/graphql/utils"
 	"fmt"
@@ -15,13 +16,15 @@ import (
 )
 
 type TodoAccess struct {
-	DB *gorm.DB
+	DB   *gorm.DB
+	Mode types.Mode
 }
 
 // New: TodoService factory
-func New(db *gorm.DB) *TodoAccess {
+func New(db *gorm.DB, mode types.Mode) *TodoAccess {
 	return &TodoAccess{
-		DB: db,
+		DB:   db,
+		Mode: mode,
 	}
 }
 
@@ -31,11 +34,16 @@ func (m *TodoAccess) GetAll() []*models.Todo {
 	var todos []*models.Todo
 	var cnt int64
 
-	// Navigate all fields
-	// m.DB.Preload(clause.Associations).Preload("TodoExt.Priority").Find(&entities).Count(&cnt)
-
-	// Navigate only "Tags". "TodoExt" and "User" will be queried by TodoResolver when required from Query.
-	m.DB.Preload("Tags").Find(&entities).Count(&cnt)
+	switch m.Mode {
+	case types.GraphQL:
+		// Navigate only "Tags". "TodoExt" and "User" will be queried by TodoResolver when required from Query.
+		m.DB.Preload("Tags").Find(&entities).Count(&cnt)
+	case types.RestFul:
+		// Navigate all fields
+		m.DB.Preload(clause.Associations).Preload("TodoExt.Priority").Find(&entities).Count(&cnt)
+	default:
+		panic("the query mode is not supported")
+	}
 
 	if cnt > 0 {
 		for _, entity := range entities {
@@ -55,11 +63,16 @@ func (m *TodoAccess) GetOne(id uuid.UUID) *models.Todo {
 	var todo *models.Todo
 	var cnt int64
 
-	// Navigate all fields
-	// m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, id).Preload(clause.Associations).Preload("TodoExt.Priority").First(&entity).Count(&cnt)
-
-	// Navigate only "Tags". "TodoExt" and "User" will be queried by TodoResolver when required from Query.
-	m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, id).Preload("Tags").First(&entity).Count(&cnt)
+	switch m.Mode {
+	case types.GraphQL:
+		// Navigate only "Tags". "TodoExt" and "User" will be queried by TodoResolver when required from Query.
+		m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, id).Preload("Tags").First(&entity).Count(&cnt)
+	case types.RestFul:
+		// Navigate all fields
+		m.DB.Model(&dbtypes.Todo{}).Where(`"Id" = ?`, id).Preload(clause.Associations).Preload("TodoExt.Priority").First(&entity).Count(&cnt)
+	default:
+		panic("the query mode is not supported")
+	}
 
 	if cnt > 0 {
 		automapper.MapLoose(entity, &todo)

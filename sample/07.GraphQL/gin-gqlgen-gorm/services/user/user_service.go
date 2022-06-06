@@ -2,6 +2,7 @@ package userservice
 
 import (
 	models "example/graphql/graph/model"
+	"example/graphql/types"
 	dbtypes "example/graphql/types/db"
 
 	"github.com/stroiman/go-automapper"
@@ -9,13 +10,15 @@ import (
 )
 
 type UserAccess struct {
-	DB *gorm.DB
+	DB   *gorm.DB
+	Mode types.Mode
 }
 
 // New: UserService factory
-func New(db *gorm.DB) *UserAccess {
+func New(db *gorm.DB, mode types.Mode) *UserAccess {
 	return &UserAccess{
-		DB: db,
+		DB:   db,
+		Mode: mode,
 	}
 }
 
