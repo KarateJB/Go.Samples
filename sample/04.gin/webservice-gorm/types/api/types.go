@@ -18,12 +18,6 @@ type User struct {
 	Name string `json:"name"`
 }
 
-// type Todo struct {
-// 	Id     uuid.UUID `json:"id"`
-// 	Title  string    `json:"title"`
-// 	IsDone bool      `json:"isDone"`
-// }
-
 type Todo struct {
 	Id     uuid.UUID `json:"id"`
 	Title  string    `json:"title"`
@@ -31,6 +25,7 @@ type Todo struct {
 	// TrackDateTimes `json:"trackDateTimes"`
 	TodoExt TodoExt `json:"todoExt"`
 	UserId  string  `json:"userId"`
+	User    User    `json:"user"`
 	Tags    []Tag   `json:"tags"`
 }
 
