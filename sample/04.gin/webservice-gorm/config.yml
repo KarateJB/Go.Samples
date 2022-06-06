@@ -1,2 +1,2 @@
-PORT: 8001
+PORT: 8080
 DB: "host=localhost user=postgres password=1qaz2wsx dbname=postgres port=5432 sslmode=disable TimeZone=UTC"
