@@ -1,0 +1,15 @@
+type User {
+  id: ID!
+  name: String!
+}
+
+input NewUser {
+  id: ID!
+  name: String!
+}
+
+input EditUser {
+  id: ID!
+  name: String!
+}
+
