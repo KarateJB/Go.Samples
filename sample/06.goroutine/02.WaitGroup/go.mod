@@ -1,3 +1,3 @@
-module example/goroutine
+module example/waitgroup
 
-go 1.18
+go 1.21.5
